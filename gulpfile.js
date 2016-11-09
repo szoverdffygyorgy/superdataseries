@@ -51,7 +51,7 @@ gulp.task("jscs", function() {
 
 gulp.task("test", ["jsonlint", "jshint", "jscs"]);
 
-gulp.task("js", createBrowserifyTask({
+gulp.task("js", ["jsonlint", "jshint", "jscs"], createBrowserifyTask({
 	entries: ["./src/public/main.js"],
 	outputFileName: "main.built.js",
 	destFolder: "./src/public/"
