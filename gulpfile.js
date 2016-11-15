@@ -51,7 +51,23 @@ gulp.task("jscs", function() {
 
 gulp.task("test", ["jsonlint", "jshint", "jscs"]);
 
-gulp.task("js", ["jsonlint", "jshint", "jscs"], createBrowserifyTask({
+// JS Index.html
+// ==================================================
+gulp.task("js:dev", [/*"js:dummy",*/"js:prod"], createBrowserifyTask({
+	entries: ["./examples/main.js"],
+	outputFileName: "main.built.js",
+	destFolder: "./examples/"
+}));
+
+// JS production
+// ==================================================
+gulp.task("js:prod", /*["jsonlint", "jscs"],*/ createBrowserifyTask({
+	entries: ["./src/public/main.js"],
+	outputFileName: "superdataseries.js",
+	destFolder: "./dist/"
+}));
+
+gulp.task("js", /*["jsonlint", "jshint", "jscs"],*/ createBrowserifyTask({
 	entries: ["./src/public/main.js"],
 	outputFileName: "main.built.js",
 	destFolder: "./src/public/"

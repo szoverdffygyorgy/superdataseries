@@ -1,10 +1,12 @@
+"use strict";
+
 module.exports = c3.generate({
 	bindto: '#forex_chart',
 	data: {
 		x: 'x',
 		xFormat: '%Y-%m-%d %H:%M:%S',
 		mimeType: 'csv',
-		url: './forex_data_test',
+		url: './chart_data/forex_data_test',
 		groups: [
 			['HUF/USD']
 		],

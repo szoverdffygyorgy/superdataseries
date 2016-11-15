@@ -21,10 +21,20 @@
     "gulp-jsonlint": "^1.1.2",
     "jshint": "^2.9.4",
     "jshint-stylish": "^2.2.1",
+    "knob-js": "^0.1.32",
     "knockout": "^3.4.1",
     "partialify": "^3.1.6",
     "serve-static": "^1.11.1",
     "vinyl-source-stream": "^1.1.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-global-shim"
+    ]
+  },
+  "browserify-global-shim": {
+    "knockout": "ko",
+    "knob-js": "knob"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
