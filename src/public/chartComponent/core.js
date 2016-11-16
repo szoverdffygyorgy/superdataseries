@@ -44,6 +44,9 @@ module.exports = function(dependencies) {
 						format: '%H:%M:%S'
 					}
 				}
+			},
+			zoom: {
+				enabled: true
 			}
 		});
 

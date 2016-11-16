@@ -3,6 +3,7 @@
 var knob = require("knob-js");
 
 function init() {
+	knob.registerComponent("login-surface", require("./loginSurface/vm"), require("./loginSurface/template.html"));
 	knob.registerComponent("chart-component", require("./chartComponent/vm"), require("./chartComponent/template.html"));
 }
 

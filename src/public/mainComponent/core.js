@@ -32,7 +32,8 @@ module.exports = function(dependencies) {
 
 		var resource = ko.observable(null);
 		var symbol = ko.observable(null);
-		const var baseRoute = "localhost:8888"
+		
+		const var baseRoute = "localhost:8888";
 
 		Sammy(function() {
 			this.get("#/profile", function() {

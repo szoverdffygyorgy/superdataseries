@@ -18,19 +18,26 @@ module.exports = function(dependencies) {
 			throw new Error("config is mandatory!");
 		}
 
-		var userName = ko.observable(null);
-		var password = ko.observable(null);
+		var userInput = {
+			placeholder: "UserName",
+			value: ko.observable(null)
+		};
+
+		var passwordInput = {
+			placeholder: "password",
+			value: ko.observable(null)
+		};
 
 		var loginButton = {
 			label: "Login",
 			click: function() {
-				console.log(userName + " attempting to log in with  password" + password);
+				console.log(userInput.value() + " attempting to log in with password: " + passwordInput.value());
 			}
 		};
 
 		return {
-			userName: userName,
-			password: password,
+			userInput: userInput,
+			passwordInput: passwordInput,
 			loginButton: loginButton
 		};
 	};
