@@ -14,11 +14,13 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
+		var baseRoute = "localhost:8888";
+
 		function createMenuItem(label, url) {
 			return {
 				label: label,
 				url: url,
-				click: function {
+				click: function() {
 					location.hash = url;
 				}
 			}
@@ -32,8 +34,6 @@ module.exports = function(dependencies) {
 
 		var resource = ko.observable(null);
 		var symbol = ko.observable(null);
-		
-		const var baseRoute = "localhost:8888";
 
 		Sammy(function() {
 			this.get("#/profile", function() {
@@ -52,12 +52,12 @@ module.exports = function(dependencies) {
 			});
 
 			this.get("#/charts/:symbol", function() {
-				console.log("a chart should be here with: " + symbol);
-				symbol(this.params);
+				symbol(this.params.symbol);
+				console.log("a chart should be here with: " + symbol());
 			});
 
 			this.get("", function() {
-				console.log("Root is okay");
+				console.log("Root lol");
 			});	
 		}).run();
 

@@ -46,7 +46,8 @@ module.exports = function(dependencies) {
 				}
 			},
 			zoom: {
-				enabled: true
+				enabled: true,
+				rescale: true
 			}
 		});
 
@@ -61,8 +62,16 @@ module.exports = function(dependencies) {
 			}
 		};
 
+		var resetButton = {
+			label: "Reset Chart",
+			click: function() {
+				chart.unzoom();
+			}
+		}
+
 		return {
 			chart: chart,
+			resetButton: resetButton,
 			zoomButton: zoomButton
 		};
 	};

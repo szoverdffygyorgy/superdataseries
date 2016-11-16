@@ -1,0 +1,8 @@
+<div class="menu" data-bind="foreach: { data: menu, as: 'menuItem'}">
+    <span>
+    	<knob-button class="menu-item" params="
+    		label: menuItem.label,
+    		click: menuItem.click
+    	"></knob-button>
+    </span>
+</div>
