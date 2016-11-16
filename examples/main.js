@@ -2,38 +2,30 @@ var ko = require("knockout");
 var knob = require("knob-js");
 
 var config = {
-	theme: "superdata",
-	//for default and theme 4
-	colorSet01: {
-		primaryColor: "#ff4e00",
-		secondaryColor: "#8ea604",
+	theme: "background", //background, border, border-fill, chamaileon
+	// for default and theme4
+	colors: {
+		primary: "#44c0fc",
+		secondary: "#f4f4f4",
 
-		info: {
-			background: "#25aaf2"
-		},
-		success: {
-			background: "#54c059"
-		},
-		warning: {
-			background: "#f5a500"
-		},
-		error: {
-			background: "#ee483b"
-		},
+		info: "#25aaf2",
+		success: "#54c059",
+		warning: "#f5a500",
+		error: "#ee483b",
 
 		white: "#fff",
-
-		lightGray: "#f5bb00",
-		mediumGray: "#ec9f05",
-		darkGray: "#bf3100",
-		border: "maroon",
-
 		black: "#000",
-		transparent: "transparent"
+
+		lightGray: "#f5f7f8",
+		mediumGray: "#f0f2f4",
+		darkGray: "#e5e9ec",
+
+		border: "#d2cdc6" //only for the chamaileon style
 	},
-	colorSet: {
-		primaryColor: "#44c0fc",
-		secondaryColor: "#9b9b9b",
+	// for chamaileon theme
+	color1: {
+		primary: "#44c0fc",
+		secondary: "#f4f4f4",
 
 		info: {
 			background: "#25aaf2"
@@ -64,5 +56,5 @@ var config = {
 };
 
 knob.init(config);
-superdata();
+superdataseries();
 ko.applyBindings({});

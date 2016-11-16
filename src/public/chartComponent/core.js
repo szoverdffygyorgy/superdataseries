@@ -7,6 +7,8 @@ module.exports = function(dependencies) {
 		throw new Error("dependencies.ko is mandatory!");
 	}
 
+	var ko = dependencies.ko;
+
 	return function(config) {
 		config = config || {};
 

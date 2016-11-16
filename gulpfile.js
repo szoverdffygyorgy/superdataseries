@@ -73,6 +73,10 @@ gulp.task("js", /*["jsonlint", "jshint", "jscs"],*/ createBrowserifyTask({
 	destFolder: "./src/public/"
 }));
 
+// Build example
+// ==================================================
+gulp.task("build:dev", ["js:dev"]);
+
 function createBrowserifyTask(config) {
 	return function() {
 		var bundleMethod = browserify;//global.isWatching ? watchify : browserify;
@@ -80,8 +84,8 @@ function createBrowserifyTask(config) {
 		var bundler = bundleMethod({
 			// Specify the entry point of your app
 			debug: true,
-			entries: config.entries//,
-			//standalone: "knob"
+			entries: config.entries,
+			standalone: "superdataseries"
 		});
 
 		var bundle = function() {
