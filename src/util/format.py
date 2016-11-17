@@ -21,3 +21,6 @@ for line in lines:
 	counter = counter + 1
 	if counter == int(sys.argv[5]):
 		break
+
+inputFile.close()
+outputFile.close()
