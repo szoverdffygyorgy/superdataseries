@@ -27,9 +27,9 @@ module.exports = function(dependencies) {
 		}
 
 		var menu = [
-			createMenuItem("My Portfolio", "#/profile"),
-			createMenuItem("Trade", "#/trade"),
-			createMenuItem("Charts", "#/charts")
+			createMenuItem("My Portfolio", "#profile"),
+			createMenuItem("Trade", "#trade"),
+			createMenuItem("Charts", "#charts")
 		];
 
 		var resource = ko.observable(null);

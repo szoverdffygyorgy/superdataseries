@@ -12,36 +12,42 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
+		if(!config.url) {
+			throw Error("config.url is mandatory!");
+		}
+
+		var chartUrl = config.url;
+
 		var chart = c3.generate({
-			bindto: '#test_chart',
+			bindto: "#test_chart",
 			data: {
-				x: 'x',
-				xFormat: '%Y-%m-%d %H:%M:%S',
-				mimeType: 'csv',
-				url: './chart_data/forex_data_test',
+				x: "x",
+				xFormat: "%Y-%m-%d %H:%M:%S",
+				mimeType: "csv",
+				url: chartUrl,
 				groups: [
-					['HUF/USD']
+					["HUF/USD"]
 				],
 				keys: {
-					xFormat: '%Y-%m-%d %H:%M:%S'
+					xFormat: "%Y-%m-%d %H:%M:%S"
 				}
 
 			},
 			axis: {
 				y: {
 					label: {
-						text: 'Price',
-						position: 'outer-middle'
+						text: "Price",
+						position: "outer-middle"
 					}
 				},
 				x: {
-					type: 'timeseries',
+					type: "timeseries",
 					label: {
-						text: 'Time',
-						position: 'middle'
+						text: "Time",
+						position: "middle"
 					},
 					tick: {
-						format: '%H:%M:%S'
+						format: "%M:%S"
 					}
 				}
 			},
@@ -56,9 +62,10 @@ module.exports = function(dependencies) {
 			click: function() {
 				setTimeout(function() {
 					chart.zoom([
-						'2016-10-02 17:04:17',
-						'2016-10-02 17:07:21']);
+						"2016-10-02 17:04:17",
+						"2016-10-02 17:07:21"]);
 				}, 2000);
+				//chart.load(chartUrl);
 			}
 		};
 

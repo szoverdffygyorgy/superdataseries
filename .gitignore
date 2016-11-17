@@ -36,3 +36,4 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 src/data/DAT_NT_USDHUF_T_ASK_201610.csv
+src/data/format.csv
