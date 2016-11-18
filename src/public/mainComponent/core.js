@@ -27,9 +27,9 @@ module.exports = function(dependencies) {
 		}
 
 		var menu = [
-			createMenuItem("My Portfolio", "#profile"),
-			createMenuItem("Trade", "#trade"),
-			createMenuItem("Charts", "#charts")
+			createMenuItem("My Portfolio", "#/profile"),
+			createMenuItem("Trade", "#/trade"),
+			createMenuItem("Charts", "#/charts")
 		];
 
 		var resource = ko.observable(null);
@@ -39,16 +39,19 @@ module.exports = function(dependencies) {
 			this.get("#/profile", function() {
 				resource("profile");
 				symbol(null);
+				console.log(resource());
 			});
 
 			this.get("#/trade", function() {
 				resource("trade");
 				symbol(null);
+				console.log(resource());
 			});
 
 			this.get("#/charts", function() {
 				resource("charts");
 				symbol(null);
+				console.log(resource());
 			});
 
 			this.get("#/charts/:symbol", function() {

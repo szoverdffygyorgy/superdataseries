@@ -16,10 +16,15 @@ module.exports = function(dependencies) {
 			throw Error("config.url is mandatory!");
 		}
 
+		if(!config.divId) {
+			throw Error("config.divId is mandatory!");
+		}
+
 		var chartUrl = config.url;
+		var divId = config.divId;
 
 		var chart = c3.generate({
-			bindto: "#test_chart",
+			bindto: "#" + divId,
 			data: {
 				x: "x",
 				xFormat: "%Y-%m-%d %H:%M:%S",
@@ -78,6 +83,7 @@ module.exports = function(dependencies) {
 
 		return {
 			chart: chart,
+			divId: divId,
 			resetButton: resetButton,
 			zoomButton: zoomButton
 		};

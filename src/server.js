@@ -14,7 +14,9 @@ setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");
 setRoute("/libs/knob.css", "../node_modules/knob-js/dist/knob.min.css");
 setRoute("/built/superdataseries.js", "../dist/superdataseries.js");
 setRoute("/built/main.built.js", "../examples/main.built.js");
-setRoute("/chart_data/formatted", "./data/format.csv");
+setRoute("/chart_data/formatted50", "./data/format50.csv");
+setRoute("/chart_data/formatted100", "./data/format100.csv");
+setRoute("/chart_data/formatted500", "./data/format500.csv");
 
 app.listen(8888, function(){
 	console.log("Server is running on port 8888");
