@@ -1,0 +1,20 @@
+<div>
+	<span data-bind="text: dropdownLabel">
+	</span>
+	<span>
+		<knob-dropdown params="
+			selected: selected,
+			items: symbols,
+			selectedIdx: selectedIdx,
+			rightIcon: '#icon-expand-more'
+		">
+		</knob-dropdown>
+	</span>
+</div>
+<div>
+	<knob-button params="
+		label: loadChart.label,
+		click: loadChart.click
+	">
+	</knob-button>
+</div>

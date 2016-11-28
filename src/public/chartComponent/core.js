@@ -13,11 +13,11 @@ module.exports = function(dependencies) {
 		config = config || {};
 
 		if(!config.url) {
-			throw Error("config.url is mandatory!");
+			throw new Error("config.url is mandatory!");
 		}
 
 		if(!config.divId) {
-			throw Error("config.divId is mandatory!");
+			throw new Error("config.divId is mandatory!");
 		}
 
 		var chartUrl = config.url;

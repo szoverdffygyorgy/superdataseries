@@ -6,3 +6,23 @@
     	"></knob-button>
     </span>
 </div>
+<div data-bind="if: resource() === 'login'">
+	<login-surface></login-surface>
+</div>
+<div data-bind="if: resource() === 'profile'">
+	<!--<profile-component></profile-component>-->
+</div>
+<div data-bind="if: resource() === 'trade'">
+	<!--<trader-component></trader-component>-->
+</div>
+<div data-bind="if: resource() === 'charts' && symbol() == null">
+	<chart-chooser params="
+		baseRoute: baseRoute
+	"></chart-chooser>
+</div>
+<div data-bind="if: resource() === 'charts' && symbol() != null">
+	<chart-component params="
+			url: './chart_data/formatted50',
+			divId: 'format50'
+		"></chart-component>
+</div>

@@ -14,7 +14,7 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
-		var baseRoute = "localhost:8888";
+		const baseRoute = "localhost:8888";
 
 		function createMenuItem(label, url) {
 			return {
@@ -27,6 +27,7 @@ module.exports = function(dependencies) {
 		}
 
 		var menu = [
+			createMenuItem("Login", "#/login"),
 			createMenuItem("My Portfolio", "#/profile"),
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
@@ -36,6 +37,12 @@ module.exports = function(dependencies) {
 		var symbol = ko.observable(null);
 
 		Sammy(function() {
+			this.get("#/login", function() {
+				resource("login");
+				symbol(null);
+				console.log(resource());
+			});
+
 			this.get("#/profile", function() {
 				resource("profile");
 				symbol(null);
@@ -67,7 +74,8 @@ module.exports = function(dependencies) {
 		return {
 			menu: menu,
 			resource: resource,
-			symbol: symbol
+			symbol: symbol,
+			baseRoute: baseRoute
 		};
 	};
 };
