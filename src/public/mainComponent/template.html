@@ -10,7 +10,11 @@
 	<login-surface></login-surface>
 </div>
 <div data-bind="if: resource() === 'profile'">
-	<!--<profile-component></profile-component>-->
+	<profile-component params="
+		name: 'Szipus Alfonz',
+		profilePictureUrl: 'http://www.ize.hu/_files/pics/00014/00014235.jpg',
+		balance: 10000
+	"></profile-component>
 </div>
 <div data-bind="if: resource() === 'trade'">
 	<!--<trader-component></trader-component>-->

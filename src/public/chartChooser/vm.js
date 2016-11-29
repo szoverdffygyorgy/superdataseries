@@ -1,8 +1,8 @@
 "use strict";
 
 var ko = require("knockout");
-var chartComponentCore = require("./core");
+var chartChooserCore = require("./core");
 
-module.exports = chartComponentCore({
+module.exports = chartChooserCore({
 	ko: ko
 });
