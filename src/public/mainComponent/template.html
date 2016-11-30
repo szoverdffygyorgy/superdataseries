@@ -17,7 +17,7 @@
 	"></profile-component>
 </div>
 <div data-bind="if: resource() === 'trade'">
-	<!--<trader-component></trader-component>-->
+	<trader-component></trader-component>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() == null">
 	<chart-chooser params="

@@ -1,0 +1,27 @@
+<div>
+	<h2 data-bind="text: header"></h2>
+	<span>
+		<span data-bind="text: symbolLabel"></span>
+		<knob-dropdown params="
+			selected: symbolsDropdown.selectedSymbol,
+			items: symbolsDropdown.symbols,
+			selectedIdx: symbolsDropdown.selectedSymbolIdx,
+			rightIcon: '#icon-expand-more'
+		"></knob-dropdown>
+	</span>
+	<span>
+		<span data-bind="text: transactionLabel"></span>
+		<knob-dropdown params="
+			selected: optionsDropdown.selectedOption,
+			items: optionsDropdown.options,
+			selectedIdx: optionsDropdown.selectedOptionIdx,
+			rightIcon: '#icon-expand-more'
+		"></knob-dropdown>
+	</span>
+	<span>
+		<span data-bind="text: transactionQuantity"></span>
+		<knob-input params="
+			value: transactionValue
+		"></knob-input>
+	</span>
+</div>
