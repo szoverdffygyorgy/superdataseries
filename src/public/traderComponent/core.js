@@ -53,6 +53,14 @@ module.exports = function(dependencies) {
 			])		
 		};
 
+		var transactionButton = {
+			label: "Make transaction",
+			click: function() {
+				console.log("Attempting to " + optionsDropdown.selectedOption().value + " " + transactionValue() + " stocks" +
+				 " from " + symbolsDropdown.selectedSymbol().label() + " with the symbol: " + symbolsDropdown.selectedSymbol().value);
+			}
+		};
+
 		return {
 			header: header,
 			symbolLabel: symbolLabel,
@@ -60,6 +68,7 @@ module.exports = function(dependencies) {
 			transactionQuantity: transactionQuantity,
 			symbolsDropdown: symbolsDropdown,
 			optionsDropdown: optionsDropdown,
+			transactionButton: transactionButton,
 			transactionValue: transactionValue
 		};
 	};

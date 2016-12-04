@@ -11,7 +11,7 @@ setRoute("/", "../examples/index.html");
 setRoute("/chart_data/test_data", "./data/csv_test.csv");
 setRoute("/chart_data/forex_data_test", "./data/test_data.csv");
 setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");
-setRoute("/libs/knob.css", "../node_modules/knob-js/dist/knob.min.css");
+setRoute("/libs/knob.min.css", "../node_modules/knob-js/dist/knob.min.css");
 setRoute("/built/superdataseries.js", "../dist/superdataseries.js");
 setRoute("/built/main.built.js", "../examples/main.built.js");
 setRoute("/chart_data/formatted50", "./data/format50.csv");
