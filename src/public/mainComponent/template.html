@@ -6,6 +6,9 @@
     	"></knob-button>
     </span>
 </div>
+<div data-bind="if: resource() === null">
+	<h1 data-bind="text: 'Welcome to the Virtual Stock Market!'"></h1>
+</div>
 <div data-bind="if: resource() === 'login'">
 	<login-surface></login-surface>
 </div>

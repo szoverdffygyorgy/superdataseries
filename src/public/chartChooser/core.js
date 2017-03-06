@@ -22,15 +22,15 @@ module.exports = function(dependencies) {
 		var symbols = ko.observableArray([
 			{
 				label: "Google",
-				value: "GOOG"
+				value: "SYMBOL1"
 			},
 			{
 				label: "Apple",
-				value: "AAPL"
+				value: "SYMBOL2"
 			},
 			{
 				label: "Verzion",
-				value: "VZ"
+				value: "SYMBOL3"
 			}
 		]);
 
