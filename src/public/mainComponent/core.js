@@ -28,7 +28,7 @@ module.exports = function(dependencies) {
 
 		var menu = [
 			createMenuItem("Login", "#/login"),
-			createMenuItem("My Portfolio", "#/:profileId"),
+			createMenuItem("My Portfolio", "#/:profileId"), //think about solution for logged in profiles
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
 		];

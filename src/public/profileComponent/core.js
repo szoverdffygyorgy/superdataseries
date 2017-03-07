@@ -27,7 +27,7 @@ module.exports = function(dependencies) {
 		var name = config.name;
 		var profilePictureUrl = config.profilePictureUrl;
 		var balance = config.balance;
-		var user = config.user || function() {};
+		var user = config.user || function() {}; //fix this, temporary
 
 		return {
 			name: name,
