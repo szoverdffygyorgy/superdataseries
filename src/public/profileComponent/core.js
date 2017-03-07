@@ -27,11 +27,13 @@ module.exports = function(dependencies) {
 		var name = config.name;
 		var profilePictureUrl = config.profilePictureUrl;
 		var balance = config.balance;
+		var user = config.user || function() {};
 
 		return {
 			name: name,
 			profilePictureUrl: profilePictureUrl,
-			balance: balance
+			balance: balance,
+			user: user
 		};
 	};
 };

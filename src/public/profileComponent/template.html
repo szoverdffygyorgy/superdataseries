@@ -1,9 +1,9 @@
 <div>
 	<div>
-		<span data-bind="text: 'Username: ' + name"></span>
-		<img data-bind="attr: {src: profilePictureUrl, height: 100, width: 100}">
+		<span data-bind="text: 'Username: ' + user().name"></span>
+		<img data-bind="attr: {src: user().profileUrl, height: 100, width: 100}">
 	</div>
 	<div>
-		<span data-bind="text: 'Balance: ' + balance + '$'"></span>
+		<span data-bind="text: 'Balance: ' + user().balance + '$'"></span>
 	</div>
 </div>

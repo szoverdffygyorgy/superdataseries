@@ -18,6 +18,12 @@ module.exports = function(dependencies) {
 			throw new Error("config is mandatory!");
 		}
 
+		if(!config.user && typeof config.user !== "function") {
+			throw new Error("config.user is mandatory and it should be a knockout observable!");
+		}
+
+		var user = config.user;
+
 		var userInput = {
 			placeholder: "UserName",
 			value: ko.observable(null)
@@ -31,7 +37,20 @@ module.exports = function(dependencies) {
 		var loginButton = {
 			label: "Login",
 			click: function() {
-				console.log(userInput.value() + " attempting to log in with password: " + passwordInput.value());
+				var userParams = "user=" + userInput.value() + "&pass=" + passwordInput.value();
+				var post = new XMLHttpRequest();
+				post.open("POST", "./loginrequest", true);
+
+				post.onreadystatechange = function() {
+    				if(post.readyState == 4 && post.status == 200) {
+        				console.log(post.responseText);
+        				user(JSON.parse(post.responseText));
+        				location.hash = "/" + user().userName;
+    				}	
+				}
+
+				post.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				post.send(userParams);
 			}
 		};
 

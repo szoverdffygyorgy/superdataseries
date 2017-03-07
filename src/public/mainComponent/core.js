@@ -28,13 +28,18 @@ module.exports = function(dependencies) {
 
 		var menu = [
 			createMenuItem("Login", "#/login"),
-			createMenuItem("My Portfolio", "#/profile"),
+			createMenuItem("My Portfolio", "#/:profileId"),
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
 		];
 
 		var resource = ko.observable(null);
 		var symbol = ko.observable(null);
+		var user = ko.observable(null);
+
+		ko.computed(function() {
+			console.log(user());
+		});
 
 		Sammy(function() {
 			this.get("#/login", function() {
@@ -43,7 +48,7 @@ module.exports = function(dependencies) {
 				console.log(resource());
 			});
 
-			this.get("#/profile", function() {
+			this.get("#/:profileId", function() {
 				resource("profile");
 				symbol(null);
 				console.log(resource());
@@ -75,7 +80,8 @@ module.exports = function(dependencies) {
 			menu: menu,
 			resource: resource,
 			symbol: symbol,
-			baseRoute: baseRoute
+			baseRoute: baseRoute,
+			user: user
 		};
 	};
 };

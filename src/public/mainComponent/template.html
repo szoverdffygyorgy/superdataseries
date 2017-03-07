@@ -10,25 +10,35 @@
 	<h1 data-bind="text: 'Welcome to the Virtual Stock Market!'"></h1>
 </div>
 <div data-bind="if: resource() === 'login'">
-	<login-surface></login-surface>
+	<login-surface params="
+		user: user
+	"></login-surface>
 </div>
 <div data-bind="if: resource() === 'profile'">
 	<profile-component params="
 		name: 'Defualt User',
 		profilePictureUrl: 'http://www.mukeshambani.com/photo/default.jpg',
-		balance: 10000
+		balance: 10000,
+		user: user
 	"></profile-component>
+	<!--<profile-component params="
+		user: user
+	"></profile-component>-->
 </div>
 <div data-bind="if: resource() === 'trade'">
-	<trader-component></trader-component>
+	<trader-component params="
+		user: user
+	"></trader-component>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() == null">
 	<chart-chooser params="
+		user: user,
 		baseRoute: baseRoute
 	"></chart-chooser>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() != null">
 	<chart-component params="
+			user: user,
 			url: './chart_data/formatted50',
 			divId: 'format50'
 		"></chart-component>
