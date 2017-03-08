@@ -21,24 +21,34 @@ module.exports = function(dependencies) {
 				label: label,
 				url: url,
 				click: function() {
+					console.log(menu());
 					location.hash = url;
 				}
 			}
 		}
 
-		var menu = [
+		function updateProfieButton(profileButton, userName) {
+			console.log(userName, "!!!!!!!44");
+			profileButton.url = "#/users/" + userName;
+		}
+
+		var menu = ko.observableArray([
 			createMenuItem("Login", "#/login"),
-			createMenuItem("My Portfolio", "#/:profileId"), //think about solution for logged in profiles
+			createMenuItem("My Portfolio", "#/users/:profileId"), //think about solution for logged in profiles
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
-		];
+		]);
 
 		var resource = ko.observable(null);
 		var symbol = ko.observable(null);
 		var user = ko.observable(null);
 
 		ko.computed(function() {
-			console.log(user());
+			if(user() !== null) {
+				console.log("TRIGGERED");
+				menu()[1].url = updateProfieButton(menu()[1], user().userName);
+				console.log(menu());
+			}
 		});
 
 		Sammy(function() {
@@ -48,7 +58,7 @@ module.exports = function(dependencies) {
 				console.log(resource());
 			});
 
-			this.get("#/:profileId", function() {
+			this.get("#/users/:profileId", function() {
 				resource("profile");
 				symbol(null);
 				console.log(resource());

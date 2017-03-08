@@ -45,7 +45,7 @@ module.exports = function(dependencies) {
     				if(post.readyState == 4 && post.status == 200) {
         				console.log(post.responseText);
         				user(JSON.parse(post.responseText));
-        				location.hash = "/" + user().userName;
+        				location.hash = "/users/" + user().userName;
     				}	
 				}
 
