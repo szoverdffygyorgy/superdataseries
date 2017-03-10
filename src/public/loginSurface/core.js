@@ -39,6 +39,7 @@ module.exports = function(dependencies) {
 			click: function() {
 				var userParams = "user=" + userInput.value() + "&pass=" + passwordInput.value();
 				var post = new XMLHttpRequest();
+				
 				post.open("POST", "./loginrequest", true);
 
 				post.onreadystatechange = function() {

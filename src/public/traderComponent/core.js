@@ -12,6 +12,12 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
+		if(config.user === null) {
+			throw new Error("config.user is mandatory!");
+		}
+
+		var user = config.user;
+
 		const header = "Trade";
 		const symbolLabel = "Symbol ";
 		const transactionLabel = "Transaction ";
@@ -56,8 +62,27 @@ module.exports = function(dependencies) {
 		var transactionButton = {
 			label: "Make transaction",
 			click: function() {
-				console.log("Attempting to " + optionsDropdown.selectedOption().value + " " + transactionValue() + " stocks" +
-				 " from " + symbolsDropdown.selectedSymbol().label() + " with the symbol: " + symbolsDropdown.selectedSymbol().value);
+				console.log("Attempting to " + optionsDropdown.selectedOption().value +
+				 " " + transactionValue() + " stocks" +
+				 " from " + symbolsDropdown.selectedSymbol().label() + " with the symbol: " +
+				  symbolsDropdown.selectedSymbol().value);
+
+				var post = new XMLHttpRequest();
+				var tradeParams = "user=" + user().userName + "&transactionType=" +
+				 optionsDropdown.selectedOption().value + "&transactionValue=" + transactionValue();
+
+				 post.open("POST", "./transaction", true);
+
+				 post.onreadystatechange = function() {
+				 	if(post.readyState == 4, post.status == 200) {
+				 		console.log(post.responseText);
+				 		user(JSON.parse(post.responseText));
+				 		location.hash = "/users/" + user().userName;
+				 	}
+				 }
+
+				 post.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				 post.send(tradeParams);
 			}
 		};
 

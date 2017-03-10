@@ -12,6 +12,55 @@ app.use(bodyParser.json());
 
 mongoose.connect('mongodb://localhost:27017/users');
 
+var User = mongoose.model("User", {name: String, userName: String,
+ password: String, profileUrl: String, balance: Number});
+
+app.post("/loginrequest", function(req, res) {
+    var userName = req.body.user;
+    var password = req.body.pass;
+
+    User.findOne({"userName": userName}, function(err, user) {
+        if(err) {
+            throw new Error(err);
+        } else {
+            console.log(user);
+            res.send(JSON.stringify(user));
+        }
+    });
+});
+
+app.post("/transaction", function(req, res) {
+    var userName = req.body.user;
+    var transactionType = req.body.transactionType;
+    var transactionValue = parseInt(req.body.transactionValue);
+
+    User.findOne({"userName": userName}, function(err, user) {
+        if(err) {
+            throw new Error(err);
+        } else {
+            if(transactionType === "buy") {
+                user.balance -= transactionValue;
+            } else if(transactionType === "sell") {
+                user.balance += transactionValue;
+            } else {
+                throw new Error("Invalid transactionType:" + transactionType);
+            }
+
+            user.save(function(err) {
+                if(err) {
+                    throw new Error(err);
+                } else {
+                    console.log("SAVED/UPDATED", user);
+                }
+            });
+
+            res.send(JSON.stringify(user));
+        }
+    });
+
+    console.log(userName, transactionType, transactionValue);
+});
+
 //app.use(express.static("examples/index.html"));
 
 setRoute("/", "../examples/index.html");
@@ -24,24 +73,6 @@ setRoute("/built/main.built.js", "../examples/main.built.js");
 setRoute("/chart_data/formatted50", "./data/format50.csv");
 setRoute("/chart_data/formatted100", "./data/format100.csv");
 setRoute("/chart_data/formatted500", "./data/format500.csv");
-
-var User = mongoose.model("User", {name: String, userName: String, password: String, profileUrl: String, balance: Number});
-
-app.post("/loginrequest", function(req, res) {
-    var userName = req.body.user;
-    var password = req.body.pass;
-
-    User.find({"userName": userName}, function(err, user) {
-        if(err) {
-            throw new Error(err);
-        } else {
-            //console.log(res);
-            console.log(user[0]);
-            //res.setHeader("Content-type", "text/plain");
-            res.send(JSON.stringify(user[0]));
-        }
-    });
-});
 
 app.listen(8888, function(){
 	console.log("Host Server is running on port 8888");

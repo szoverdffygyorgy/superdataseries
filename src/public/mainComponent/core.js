@@ -21,14 +21,15 @@ module.exports = function(dependencies) {
 				label: label,
 				url: url,
 				click: function() {
-					
 					if(user() === null) {
 						location.hash = "#/login";
 					} else if(user() !== null && label === "My Portfolio") {
+						console.log("!!!!!!!!!!!!!!4");
 						url = "#/users/" + user().userName;
+						location.hash = url;
+					} else {
+						location.hash = url;
 					}
-
-					location.hash = url;
 				}
 			}
 		}
