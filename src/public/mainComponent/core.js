@@ -21,15 +21,16 @@ module.exports = function(dependencies) {
 				label: label,
 				url: url,
 				click: function() {
-					console.log(menu());
+					
+					if(user() === null) {
+						location.hash = "#/login";
+					} else if(user() !== null && label === "My Portfolio") {
+						url = "#/users/" + user().userName;
+					}
+
 					location.hash = url;
 				}
 			}
-		}
-
-		function updateProfieButton(profileButton, userName) {
-			console.log(userName, "!!!!!!!44");
-			profileButton.url = "#/users/" + userName;
 		}
 
 		var menu = ko.observableArray([
@@ -43,14 +44,6 @@ module.exports = function(dependencies) {
 		var symbol = ko.observable(null);
 		var user = ko.observable(null);
 
-		ko.computed(function() {
-			if(user() !== null) {
-				console.log("TRIGGERED");
-				menu()[1].url = updateProfieButton(menu()[1], user().userName);
-				console.log(menu());
-			}
-		});
-
 		Sammy(function() {
 			this.get("#/login", function() {
 				resource("login");
@@ -61,7 +54,7 @@ module.exports = function(dependencies) {
 			this.get("#/users/:profileId", function() {
 				resource("profile");
 				symbol(null);
-				console.log(resource());
+				console.log(resource(), menu());
 			});
 
 			this.get("#/trade", function() {

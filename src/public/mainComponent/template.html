@@ -9,34 +9,31 @@
 <div data-bind="if: resource() === null">
 	<h1 data-bind="text: 'Welcome to the Virtual Stock Market!'"></h1>
 </div>
-<div data-bind="if: resource() === 'login'">
+<div data-bind="if: resource() === 'login' || user() === null">
 	<login-surface params="
 		user: user
 	"></login-surface>
 </div>
-<div data-bind="if: resource() === 'profile'">
+<div data-bind="if: resource() === 'profile' && user() !== null">
 	<profile-component params="
 		name: 'Defualt User',
 		profilePictureUrl: 'http://www.mukeshambani.com/photo/default.jpg',
 		balance: 10000,
 		user: user
 	"></profile-component>
-	<!--<profile-component params="
-		user: user
-	"></profile-component>-->
 </div>
-<div data-bind="if: resource() === 'trade'">
+<div data-bind="if: resource() === 'trade' && user() != null">
 	<trader-component params="
 		user: user
 	"></trader-component>
 </div>
-<div data-bind="if: resource() === 'charts' && symbol() == null">
+<div data-bind="if: resource() === 'charts' && symbol() == null && user() !== null">
 	<chart-chooser params="
 		user: user,
 		baseRoute: baseRoute
 	"></chart-chooser>
 </div>
-<div data-bind="if: resource() === 'charts' && symbol() != null">
+<div data-bind="if: resource() === 'charts' && symbol() != null && user() != null">
 	<chart-component params="
 			user: user,
 			url: './chart_data/formatted50',
