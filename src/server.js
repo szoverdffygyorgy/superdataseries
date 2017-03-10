@@ -19,12 +19,12 @@ app.post("/loginrequest", function(req, res) {
     var userName = req.body.user;
     var password = req.body.pass;
 
-    User.findOne({"userName": userName}, function(err, user) {
+    User.find({"userName": userName}, function(err, users) {
         if(err) {
             throw new Error(err);
         } else {
-            console.log(user);
-            res.send(JSON.stringify(user));
+            console.log(users[0]);
+            res.send(JSON.stringify(users[0]));
         }
     });
 });
@@ -34,10 +34,12 @@ app.post("/transaction", function(req, res) {
     var transactionType = req.body.transactionType;
     var transactionValue = parseInt(req.body.transactionValue);
 
-    User.findOne({"userName": userName}, function(err, user) {
+    User.find({"userName": userName}, function(err, users) {
         if(err) {
             throw new Error(err);
         } else {
+            var user = users[0];
+
             if(transactionType === "buy") {
                 user.balance -= transactionValue;
             } else if(transactionType === "sell") {
@@ -54,11 +56,9 @@ app.post("/transaction", function(req, res) {
                 }
             });
 
-            res.send(JSON.stringify(user));
+            res.send(JSON.stringify(user.balance));
         }
     });
-
-    console.log(userName, transactionType, transactionValue);
 });
 
 //app.use(express.static("examples/index.html"));
