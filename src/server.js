@@ -19,12 +19,19 @@ app.post("/loginrequest", function(req, res) {
     var userName = req.body.user;
     var password = req.body.pass;
 
-    User.find({"userName": userName}, function(err, users) {
+    User.findOne({"userName": userName, "password": password}, function(err, user) {
         if(err) {
             throw new Error(err);
         } else {
-            console.log(users[0]);
-            res.send(JSON.stringify(users[0]));
+            console.log(user);
+            var response = {
+                userName: user.userName,
+                name: user.name,
+                profileUrl: user.profileUrl,
+                balance: user.balance
+            };
+
+            res.send(JSON.stringify(response));
         }
     });
 });
@@ -34,12 +41,10 @@ app.post("/transaction", function(req, res) {
     var transactionType = req.body.transactionType;
     var transactionValue = parseInt(req.body.transactionValue);
 
-    User.find({"userName": userName}, function(err, users) {
+    User.findOne({"userName": userName}, function(err, user) {
         if(err) {
             throw new Error(err);
         } else {
-            var user = users[0];
-
             if(transactionType === "buy") {
                 user.balance -= transactionValue;
             } else if(transactionType === "sell") {
@@ -47,7 +52,7 @@ app.post("/transaction", function(req, res) {
             } else {
                 throw new Error("Invalid transactionType:" + transactionType);
             }
-
+            
             user.save(function(err) {
                 if(err) {
                     throw new Error(err);

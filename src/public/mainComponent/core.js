@@ -55,7 +55,7 @@ module.exports = function(dependencies) {
 			this.get("#/users/:profileId", function() {
 				resource("profile");
 				symbol(null);
-				console.log(resource(), menu());
+				console.log(resource());
 			});
 
 			this.get("#/trade", function() {
