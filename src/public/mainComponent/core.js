@@ -20,11 +20,11 @@ module.exports = function(dependencies) {
 			return {
 				label: label,
 				url: url,
+				visible: ko.observable(true),
 				click: function() {
 					if(user() === null) {
 						location.hash = "#/login";
 					} else if(user() !== null && label === "My Portfolio") {
-						console.log("!!!!!!!!!!!!!!4");
 						url = "#/users/" + user().userName;
 						location.hash = url;
 					} else {
@@ -34,12 +34,23 @@ module.exports = function(dependencies) {
 			}
 		}
 
-		var menu = ko.observableArray([
+		var menu = [
 			createMenuItem("Login", "#/login"),
+			{
+				label: "Logout",
+				url: "#/login",
+				visible: ko.observable(false),
+				click: function() {
+					user(null);
+					menu[0].visible(true);
+					menu[1].visible(false);
+					location.hash = "#/login";
+				}
+			},
 			createMenuItem("My Portfolio", "#/users/:profileId"), //think about solution for logged in profiles
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
-		]);
+		];
 
 		var resource = ko.observable(null);
 		var symbol = ko.observable(null);

@@ -1,6 +1,6 @@
 <div class="menu" data-bind="foreach: { data: menu, as: 'menuItem'}">
     <span>
-    	<knob-button class="menu-item" params="
+    	<knob-button class="menu-item" data-bind="visible: menuItem.visible" params="
     		label: menuItem.label,
     		click: menuItem.click
     	"></knob-button>
@@ -11,7 +11,8 @@
 </div>
 <div data-bind="if: resource() === 'login' || user() === null">
 	<login-surface params="
-		user: user
+		user: user,
+		menu: menu
 	"></login-surface>
 </div>
 <div data-bind="if: resource() === 'profile' && user() !== null">

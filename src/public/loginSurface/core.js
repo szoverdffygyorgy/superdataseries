@@ -23,6 +23,8 @@ module.exports = function(dependencies) {
 		}
 
 		var user = config.user;
+		var loginLabel = config.loginLabel;
+		var menu = config.menu;
 
 		var userInput = {
 			placeholder: "UserName",
@@ -46,6 +48,8 @@ module.exports = function(dependencies) {
     				if(post.readyState == 4 && post.status == 200) {
         				console.log(post.responseText);
         				user(JSON.parse(post.responseText));
+        				menu[0].visible(false);
+        				menu[1].visible(true);
         				location.hash = "/users/" + user().userName;
     				}	
 				}
