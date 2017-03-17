@@ -16,11 +16,11 @@ mongoose.connect('mongodb://localhost:27017/users');
 var User = mongoose.model("User", {name: String, userName: String,
  password: String, profileUrl: String, balance: Number});
 
-app.post("/loginrequest", function(req, res) {
+app.post("/loginrequest", (req, res) => {
     var userName = req.body.user;
     var password = req.body.pass;
 
-    User.findOne({"userName": userName, "password": password}, function(err, user) {
+    User.findOne({"userName": userName, "password": password}, (err, user) => {
         if(err) {
             throw new Error(err);
         } else {
@@ -37,12 +37,12 @@ app.post("/loginrequest", function(req, res) {
     });
 });
 
-app.post("/transaction", function(req, res) {
+app.post("/transaction", (req, res) => {
     var userName = req.body.user;
     var transactionType = req.body.transactionType;
     var transactionValue = parseInt(req.body.transactionValue);
 
-    User.findOne({"userName": userName}, function(err, user) {
+    User.findOne({"userName": userName}, (err, user) => {
         if(err) {
             throw new Error(err);
         } else {
@@ -80,11 +80,11 @@ setRoute("/chart_data/formatted50", "./data/format50.csv");
 setRoute("/chart_data/formatted100", "./data/format100.csv");
 setRoute("/chart_data/formatted500", "./data/format500.csv");
 
-app.listen(8888, function(){
+app.listen(8888, () => {
 	console.log("Host Server is running on port 8888");
 });
 
-app.get("/influx_test", function(req, res) {
+app.get("/influx_test", (req, res) => {
     http.get("http://localhost:8086/query?chunked=true&db=test&epoch=ns&q=SELECT+%2A+FROM+treasures",
      function(response) {
         response.setEncoding("utf-8");
@@ -103,7 +103,7 @@ app.get("/influx_test", function(req, res) {
 });
 
 function readContent(filePath, callback) {
-    fs.readFile(filePath, "utf-8", function (err, content) {
+    fs.readFile(filePath, "utf-8", (err, content) => {
         if (err) {
         	return callback(err);
         }
@@ -113,7 +113,7 @@ function readContent(filePath, callback) {
 }
 
 function setRoute(route, path) {
-    app.get(route, function(req, res) {
+    app.get(route, (req, res) => {
         readContent(path, function(err, content) {
             if(err) {
                 throw err;
