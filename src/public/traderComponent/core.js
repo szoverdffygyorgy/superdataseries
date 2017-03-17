@@ -75,11 +75,9 @@ module.exports = function(dependencies) {
 
 				 post.onreadystatechange = function() {
 				 	if(post.readyState == 4, post.status == 200) {
-				 		//console.log(post.responseText);
 				 		var modifiedBalaneUser = user();
 				 		modifiedBalaneUser.balance = post.responseText;
 				 		user(modifiedBalaneUser);
-				 		//console.log(user());
 				 		location.hash = "/users/" + user().userName;
 				 	}
 				 }

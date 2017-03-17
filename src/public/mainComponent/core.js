@@ -88,7 +88,7 @@ module.exports = function(dependencies) {
 
 			this.get("", function() {
 				console.log("Root lol");
-			});	
+			});
 		}).run();
 
 		return {

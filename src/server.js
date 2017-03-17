@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var bodyParser = require("body-parser");
 var express = require("express");
 var fs = require("fs");
+var http = require("http");
 
 var app = express();
 
@@ -81,6 +82,24 @@ setRoute("/chart_data/formatted500", "./data/format500.csv");
 
 app.listen(8888, function(){
 	console.log("Host Server is running on port 8888");
+});
+
+app.get("/influx_test", function(req, res) {
+    http.get("http://localhost:8086/query?chunked=true&db=test&epoch=ns&q=SELECT+%2A+FROM+treasures",
+     function(response) {
+        response.setEncoding("utf-8");
+        let rawData = "";
+
+        response.on("data", (chunk) => {
+            rawData += chunk;
+        });
+
+        response.on("end", () => {
+            let parsedData = JSON.parse(rawData);
+            console.log(parsedData);
+            res.send(parsedData);
+        });
+     })
 });
 
 function readContent(filePath, callback) {
