@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 mongoose.connect('mongodb://localhost:27017/users');
 
 var User = mongoose.model("User", {name: String, userName: String,
- password: String, profileUrl: String, balance: Number});
+ password: String, profileUrl: String, balance: Number, portfolio: Object});
 
 app.post("/loginrequest", (req, res) => {
     var userName = req.body.user;
