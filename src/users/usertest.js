@@ -12,7 +12,7 @@ for(var i = 0; i < 10; i += 1) {
 
 	user.portfolio = {
 		"GOOG": i % 2 === 0 ? 10 + i : 20 + i,
-		"AAPL": i % 2 === 0 ? 20 + i : 10 + i 
+		"AAPL": i % 2 === 0 ? 20 + i : 10 + i
 	}
 
 	user.save(function(err) {
