@@ -18,8 +18,8 @@ for line in lines:
 	if len(line) < 30:
 		timeSeriesName = line[-8:-1]
 	else:
-		outputFile.write(timeSeriesName + ",price=" + line[-11:-1] + " " + line[:10] + "T" +
-		line[12:-12] + "Z" + "\n")
+		outputFile.write("INSERT " + timeSeriesName + ",price=" + line[-11:-1] +
+		 " " + line[:10] + "T" + line[11:-12] + "Z" + "\n")
 
 inputFile.close()
 outputFile.close()
