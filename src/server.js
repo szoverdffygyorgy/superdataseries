@@ -1,17 +1,18 @@
 "use strict";
 
-var mongoose = require('mongoose');
-var bodyParser = require("body-parser");
-var express = require("express");
-var fs = require("fs");
-var http = require("http");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const express = require("express");
+const Influx = require("influx");
+const fs = require("fs");
+const http = require("http");
 
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost:27017/users');
+mongoose.connect("mongodb://localhost:27017/users");
 
 var User = mongoose.model("User", {name: String, userName: String,
  password: String, profileUrl: String, balance: Number, portfolio: Object});
@@ -53,8 +54,8 @@ app.post("/transaction", (req, res) => {
             } else {
                 throw new Error("Invalid transactionType:" + transactionType);
             }
-            
-            user.save(function(err) {
+
+            user.save((err) => {
                 if(err) {
                     throw new Error(err);
                 } else {
@@ -86,7 +87,7 @@ app.listen(8888, () => {
 
 app.get("/influx_test", (req, res) => {
     http.get("http://localhost:8086/query?chunked=true&db=test&epoch=ns&q=SELECT+%2A+FROM+treasures",
-     function(response) {
+     (response) => {
         response.setEncoding("utf-8");
         let rawData = "";
 
@@ -100,6 +101,32 @@ app.get("/influx_test", (req, res) => {
             res.send(parsedData);
         });
      })
+});
+
+const influx = new Influx.InfluxDB({
+  host: 'localhost:8086',
+  database: 'pirates',
+  schema: [
+      {
+          measurement: 'treasures',
+          fields: {
+          captain_id: Influx.FieldType.STRING,
+          value: Influx.FieldType.INTEGER
+          },
+      tags: []
+      }
+  ]
+});
+
+app.get("/influx_node_test", (req, res) => {
+    influx.query(/*"SELECT * FROM test.autogen.treasures "*/"SELECT * FROM time" +
+    "SeriesTest.autogen.HUFUSD").then((response) => {
+      console.log(response);
+        res.send(response);
+    }).catch((reason) => {
+        console.log(reason);
+        res.send(reason);
+    });
 });
 
 function readContent(filePath, callback) {
