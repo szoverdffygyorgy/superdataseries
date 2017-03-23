@@ -119,8 +119,7 @@ const influx = new Influx.InfluxDB({
 });
 
 app.get("/influx_node_test", (req, res) => {
-    influx.query(/*"SELECT * FROM test.autogen.treasures "*/"SELECT * FROM time" +
-    "SeriesTest.autogen.HUFUSD").then((response) => {
+    influx.query(/*"SELECT * FROM test.autogen.treasures "*/"SELECT * FROM timeSeriesTest.autogen.HUFUSD").then((response) => {
       console.log(response);
         res.send(response);
     }).catch((reason) => {
