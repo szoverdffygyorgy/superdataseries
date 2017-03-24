@@ -10,8 +10,8 @@ let lineReader = require("readline").createInterface({
 lineReader.on("line", (line) => {
   let newLine;
   if(line.length > 29) {
-    newLine = line.substr(7,3) + line.substr(11,3) + "," + line.substr(15,16) +
-     " A_random_value=8 " + moment(line.substr(32,20)).unix() + "\r\n";
+    newLine = line.substr(7,3) + line.substr(11,3) + ",tempTag=0 "  + line.substr(15,16) +
+    " " + moment(line.substr(32,20)).unix() + "\r\n";
   } else {
     newLine = line + "\r\n";
   }

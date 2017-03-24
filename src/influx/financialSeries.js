@@ -48,9 +48,9 @@ influx.createDatabase("timeSeriesTest").then(() => {
           measurement: line.substr(7,3) + line.substr(11,3),
           tags: {},
           fields: {
-            "price": line.substr(21, 10),
-            "time": time
-          }
+            price: line.substr(21, 10)
+          },
+          timestamp: time
         }
       ], {
         database: "timeSeriesTest",
@@ -61,14 +61,6 @@ influx.createDatabase("timeSeriesTest").then(() => {
       }).catch((reason) => {
         console.log("Insertion failed due to: " + reason);
       });
-      /*dataPoints.push({
-        measurement: line.substr(7,3) + line.substr(11,3),
-        tags: {},
-        fields: {
-          "price": line.substr(21, 10),
-          "time": time
-        }
-      });*/
     }
   });
 }).catch((reason) => {
