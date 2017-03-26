@@ -4,6 +4,7 @@
   "description": "Chart Test",
   "main": "index.js",
   "dependencies": {
+    "async": "^2.2.0",
     "body-parser": "^1.17.1",
     "browserify": "^13.1.1",
     "c3": "^0.4.11",

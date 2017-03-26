@@ -6,6 +6,7 @@ const express = require("express");
 const Influx = require("influx");
 const fs = require("fs");
 const http = require("http");
+const moment = require("moment");
 
 let app = express();
 
@@ -14,8 +15,14 @@ app.use(bodyParser.json());
 
 mongoose.connect("mongodb://localhost:27017/users");
 
-let User = mongoose.model("User", {name: String, userName: String,
+const User = mongoose.model("User", {name: String, userName: String,
  password: String, profileUrl: String, balance: Number, portfolio: Object});
+
+const TimeSeries = mongoose.model("TimeSeries",
+ {
+   name: String,
+   dataPoints: Object
+ });
 
 app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
@@ -58,13 +65,43 @@ app.post("/transaction", (req, res) => {
       user.save((err) => {
         if(err) {
           throw new Error(err);
-        } else {
-          console.log("SAVED/UPDATED", user);
         }
       });
 
       res.send(JSON.stringify(user.balance));
     }
+  });
+});
+
+app.get("/series", (req, res) => {
+  TimeSeries.find({}, (err, series) => {
+    if(err) {
+      throw new Error(err);
+    } else {
+      res.send(JSON.stringify(series));
+    }
+  })
+});
+
+app.post("/seriesQuery", (req, res) => {
+  let from = req.body.from || "0000000000";
+  let to = req.body.to || String(moment().unix());
+  let seriesName = req.body.series;
+
+  let response = {};
+
+  TimeSeries.findOne({name: seriesName}, (err, series) => {
+      if(err) {
+        throw new Error(err);
+      } else {
+        for(let date in series.dataPoints) {
+          if(date > from && date < to) {
+            response[date] = series.dataPoints[date];
+          }
+        }
+
+        res.send(JSON.stringify(response));
+      }
   });
 });
 
