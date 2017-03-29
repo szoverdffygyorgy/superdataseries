@@ -7,12 +7,15 @@ const Influx = require("influx");
 const fs = require("fs");
 const http = require("http");
 const moment = require("moment");
+const Promise = require("promise");
 
 let app = express();
+let readFile = Promise.denodeify(fs.readFile);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
 
 const User = mongoose.model("User", {name: String, userName: String,
@@ -28,20 +31,18 @@ app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
   let password = req.body.pass;
 
-  User.findOne({"userName": userName, "password": password}, (err, user) => {
-    if(err) {
-      throw new Error(err);
-    } else {
-      console.log(user);
-      let response = {
-        userName: user.userName,
-        name: user.name,
-        profileUrl: user.profileUrl,
-        balance: user.balance
-      };
+  User.findOne({"userName": userName, "password": password}).then((user) => {
+    console.log(user);
+    let response = {
+      userName: user.userName,
+      name: user.name,
+      profileUrl: user.profileUrl,
+      balance: user.balance
+    };
 
-      res.send(JSON.stringify(response));
-    }
+    res.send(JSON.stringify(response));
+  }).catch((reason) => {
+    throw new Error(reason);
   });
 });
 
@@ -50,58 +51,53 @@ app.post("/transaction", (req, res) => {
   let transactionType = req.body.transactionType;
   let transactionValue = parseInt(req.body.transactionValue);
 
-  User.findOne({"userName": userName}, (err, user) => {
-    if(err) {
-      throw new Error(err);
+  User.findOne({"userName": userName}).then((user) => {
+    if(transactionType === "buy") {
+      user.balance -= transactionValue;
+    } else if(transactionType === "sell") {
+      user.balance += transactionValue;
     } else {
-      if(transactionType === "buy") {
-        user.balance -= transactionValue;
-      } else if(transactionType === "sell") {
-        user.balance += transactionValue;
-      } else {
-        throw new Error("Invalid transactionType:" + transactionType);
-      }
-
-      user.save((err) => {
-        if(err) {
-          throw new Error(err);
-        }
-      });
-
-      res.send(JSON.stringify(user.balance));
+      throw new Error("Invalid transactionType:" + transactionType);
     }
+
+    user.save().then((success) => {
+      console.log("Updated user: " + success);
+    }).catch((reason) => {
+      throw new Error(reason);
+    });
+
+    res.send(JSON.stringify(user.balance));
+  }).catch((reason) => {
+    throw new Error(reason);
   });
 });
 
 app.get("/series", (req, res) => {
-  TimeSeries.find({}, (err, series) => {
-    if(err) {
-      throw new Error(err);
-    } else {
-      res.send(JSON.stringify(series));
-    }
-  })
+  TimeSeries.find({}).then((series) => {
+    res.send(JSON.stringify(series));
+  }).catch((reason) => {
+    throw new Error(reason);
+  });
 });
 
 app.post("/seriesQuery", (req, res) => {
-  let from = req.body.from || "0000000000";
-  let to = req.body.to || String(moment().unix());
+  let from = parseInt(req.body.from) || parseInt("0000000000");
+  let to = parseInt(req.body.to) || parseInt(moment().unix());
   let seriesName = req.body.series;
 
   let response = {};
 
-  TimeSeries.findOne({name: seriesName}, (err, series) => {
-      if(err) {
-        throw new Error(err);
-      } else {
-        for(let date in series.dataPoints) {
-          if(date > from && date < to) {
-            response[date] = series.dataPoints[date];
-          }
-        }
-
-        res.send(JSON.stringify(response));
+  TimeSeries.findOne({"name": seriesName}).then((series) => {
+    for(let date in series.dataPoints) {
+      console.log(date);
+      if(date > from && date < to) {
+        response[date] = series.dataPoints[date];
       }
+    }
+    console.log(response);
+    res.send(JSON.stringify(response));
+  }).catch((reason) => {
+    throw new Error(reason);
   });
 });
 
@@ -122,58 +118,56 @@ app.listen(8888, () => {
 	console.log("Host Server is running on port 8888");
 });
 
-app.get("/influx_test", (req, res) => {
-  http.get("http://localhost:8086/query?chunked=true&db=test&epoch=ns&q=SELECT+%2A+FROM+treasures",
-    (response) => {
-      response.setEncoding("utf-8");
-      let rawData = "";
-
-      response.on("data", (chunk) => {
-        rawData += chunk;
-      });
-
-      response.on("end", () => {
-        let parsedData = JSON.parse(rawData);
-        console.log(parsedData);
-        res.send(parsedData);
-      });
-    })
-});
-
-const influx = new Influx.InfluxDB({
-  host: 'localhost:8086',
-  database: 'pirates',
-  schema: [
-    {
-      measurement: 'treasures',
-      fields: {
-        captain_id: Influx.FieldType.STRING,
-        value: Influx.FieldType.INTEGER
-      },
-      tags: []
-    }
-  ]
-});
-
-app.get("/influx_node_test", (req, res) => {
-  /*"SELECT * FROM test.autogen.treasures "*/
-  influx.query("SELECT time, price FROM timeSeriesTest.autogen.HUFUSD")
-  .then((response) => {
-    console.log(response);
-    res.send(response);
-  }).catch((reason) => {
-    console.log(reason);
-    res.send(reason);
-  });
-});
+// app.get("/influx_test", (req, res) => {
+//   http.get("http://localhost:8086/query?chunked=true&db=test&epoch=ns&q=SELECT+%2A+FROM+treasures",
+//     (response) => {
+//       response.setEncoding("utf-8");
+//       let rawData = "";
+//
+//       response.on("data", (chunk) => {
+//         rawData += chunk;
+//       });
+//
+//       response.on("end", () => {
+//         let parsedData = JSON.parse(rawData);
+//         console.log(parsedData);
+//         res.send(parsedData);
+//       });
+//     })
+// });
+//
+// const influx = new Influx.InfluxDB({
+//   host: 'localhost:8086',
+//   database: 'pirates',
+//   schema: [
+//     {
+//       measurement: 'treasures',
+//       fields: {
+//         captain_id: Influx.FieldType.STRING,
+//         value: Influx.FieldType.INTEGER
+//       },
+//       tags: []
+//     }
+//   ]
+// });
+//
+// app.get("/influx_node_test", (req, res) => {
+//   /*"SELECT * FROM test.autogen.treasures "*/
+//   influx.query("SELECT time, price FROM timeSeriesTest.autogen.HUFUSD")
+//   .then((response) => {
+//     console.log(response);
+//     res.send(response);
+//   }).catch((reason) => {
+//     console.log(reason);
+//     res.send(reason);
+//   });
+// });
 
 function readContent(filePath, callback) {
-  fs.readFile(filePath, "utf-8", (err, content) => {
-    if (err) {
-      return callback(err);
-    }
-
+  readFile(filePath, "utf-8").then((content) => {
     callback(null, content);
+  }).catch((reason) => {
+    return callback(reason);
   });
 }
 
