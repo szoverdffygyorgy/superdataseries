@@ -31,7 +31,8 @@ app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
   let password = req.body.pass;
 
-  User.findOne({"userName": userName, "password": password}).then((user) => {
+  User.findOne({"userName": userName, "password": password}).exec()
+  .then((user) => {
     console.log(user);
     let response = {
       userName: user.userName,
@@ -42,7 +43,7 @@ app.post("/loginrequest", (req, res) => {
 
     res.send(JSON.stringify(response));
   }).catch((reason) => {
-    throw new Error(reason);
+    throw new Error("Login failed due to: " + reason);
   });
 });
 
@@ -51,7 +52,8 @@ app.post("/transaction", (req, res) => {
   let transactionType = req.body.transactionType;
   let transactionValue = parseInt(req.body.transactionValue);
 
-  User.findOne({"userName": userName}).then((user) => {
+  User.findOne({"userName": userName}).exec()
+  .then((user) => {
     if(transactionType === "buy") {
       user.balance -= transactionValue;
     } else if(transactionType === "sell") {
@@ -63,20 +65,21 @@ app.post("/transaction", (req, res) => {
     user.save().then((success) => {
       console.log("Updated user: " + success);
     }).catch((reason) => {
-      throw new Error(reason);
+      throw new Error("Update failed: " + reason);
     });
 
     res.send(JSON.stringify(user.balance));
   }).catch((reason) => {
-    throw new Error(reason);
+    throw new Error("Transaction failed: " + reason);
   });
 });
 
 app.get("/series", (req, res) => {
-  TimeSeries.find({}).then((series) => {
+  TimeSeries.find({}).exec()
+  .then((series) => {
     res.send(JSON.stringify(series));
   }).catch((reason) => {
-    throw new Error(reason);
+    throw new Error("No TimeSeries found: " + reason);
   });
 });
 
@@ -87,7 +90,8 @@ app.post("/seriesQuery", (req, res) => {
 
   let response = {};
 
-  TimeSeries.findOne({"name": seriesName}).then((series) => {
+  TimeSeries.findOne({"name": seriesName}).exec()
+  .then((series) => {
     for(let date in series.dataPoints) {
       console.log(date);
       if(date > from && date < to) {
@@ -97,7 +101,7 @@ app.post("/seriesQuery", (req, res) => {
     console.log(response);
     res.send(JSON.stringify(response));
   }).catch((reason) => {
-    throw new Error(reason);
+    throw new Error("TimeSeries data no found: " + reason);
   });
 });
 

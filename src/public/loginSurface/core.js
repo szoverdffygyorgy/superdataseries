@@ -27,12 +27,12 @@ module.exports = function(dependencies) {
 		var menu = config.menu;
 
 		var userInput = {
-			placeholder: "UserName",
+			placeholder: "User",
 			value: ko.observable(null)
 		};
 
 		var passwordInput = {
-			placeholder: "password",
+			placeholder: "Password",
 			value: ko.observable(null)
 		};
 
@@ -41,7 +41,7 @@ module.exports = function(dependencies) {
 			click: function() {
 				var userParams = "user=" + userInput.value() + "&pass=" + passwordInput.value();
 				var post = new XMLHttpRequest();
-				
+
 				post.open("POST", "./loginrequest", true);
 
 				post.onreadystatechange = function() {
@@ -51,7 +51,7 @@ module.exports = function(dependencies) {
         				menu[0].visible(false);
         				menu[1].visible(true);
         				location.hash = "/users/" + user().userName;
-    				}	
+    				}
 				}
 
 				post.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
