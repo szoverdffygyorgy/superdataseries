@@ -21,10 +21,11 @@ mongoose.connect("mongodb://localhost:27017/users");
 const User = mongoose.model("User", {name: String, userName: String,
  password: String, profileUrl: String, balance: Number, portfolio: Object});
 
-const TimeSeries = mongoose.model("TimeSeries",
+ const DataPoint = mongoose.model("DataPoint",
  {
-   name: String,
-   dataPoints: Object
+   seriesName: String,
+   timeStamp: Number,
+   price: Number
  });
 
 app.post("/loginrequest", (req, res) => {
@@ -75,7 +76,7 @@ app.post("/transaction", (req, res) => {
 });
 
 app.get("/series", (req, res) => {
-  TimeSeries.find({}).exec()
+  DataPoint.find({}).exec()
   .then((series) => {
     res.send(JSON.stringify(series));
   }).catch((reason) => {
@@ -88,20 +89,13 @@ app.post("/seriesQuery", (req, res) => {
   let to = parseInt(req.body.to) || parseInt(moment().unix());
   let seriesName = req.body.series;
 
-  let response = {};
+  DataPoint.find({"seriesName": seriesName, "timeStamp": {$gt: from, $lt: to}})
+  .exec().then((dataPoints) => {
 
-  TimeSeries.findOne({"name": seriesName}).exec()
-  .then((series) => {
-    for(let date in series.dataPoints) {
-      console.log(date);
-      if(date > from && date < to) {
-        response[date] = series.dataPoints[date];
-      }
-    }
-    console.log(response);
-    res.send(JSON.stringify(response));
+    console.log(dataPoints);
+    res.send(JSON.stringify(dataPoints.length));
   }).catch((reason) => {
-    throw new Error("TimeSeries data no found: " + reason);
+    throw new Error("TimeSeries data not found: " + reason);
   });
 });
 
