@@ -2,15 +2,13 @@
 
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const express = require("express");
+const app = require("express")();
 const Influx = require("influx");
-const fs = require("fs");
 const http = require("http");
 const moment = require("moment");
 const Promise = require("promise");
+const helper = require("./helper.js")({promise: Promise, app: app});
 
-let app = express();
-let readFile = Promise.denodeify(fs.readFile);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -85,15 +83,14 @@ app.get("/series", (req, res) => {
 });
 
 app.post("/seriesQuery", (req, res) => {
-  let from = parseInt(req.body.from) || parseInt("0000000000");
-  let to = parseInt(req.body.to) || parseInt(moment().unix());
+  let from = parseInt(req.body.from) - 1 || -1;
+  let to = parseInt(req.body.to) + 1 || parseInt(moment().unix()) + 1;
   let seriesName = req.body.series;
 
   DataPoint.find({"seriesName": seriesName, "timeStamp": {$gt: from, $lt: to}})
   .exec().then((dataPoints) => {
-
     console.log(dataPoints);
-    res.send(JSON.stringify(dataPoints.length));
+    res.send(JSON.stringify(dataPoints));
   }).catch((reason) => {
     throw new Error("TimeSeries data not found: " + reason);
   });
@@ -101,16 +98,16 @@ app.post("/seriesQuery", (req, res) => {
 
 //app.use(express.static("examples/index.html"));
 
-setRoute("/", "../examples/index.html");
-setRoute("/chart_data/test_data", "./data/csv_test.csv");
-setRoute("/chart_data/forex_data_test", "./data/test_data.csv");
-setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");
-setRoute("/libs/knob.min.css", "../node_modules/knob-js/dist/knob.min.css");
-setRoute("/built/superdataseries.js", "../dist/superdataseries.js");
-setRoute("/built/main.built.js", "../examples/main.built.js");
-setRoute("/chart_data/formatted50", "./data/format50.csv");
-setRoute("/chart_data/formatted100", "./data/format100.csv");
-setRoute("/chart_data/formatted500", "./data/format500.csv");
+helper.setRoute("/", "../examples/index.html");
+helper.setRoute("/chart_data/test_data", "./data/csv_test.csv");
+helper.setRoute("/chart_data/forex_data_test", "./data/test_data.csv");
+helper.setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");
+helper.setRoute("/libs/knob.min.css", "../node_modules/knob-js/dist/knob.min.css");
+helper.setRoute("/built/superdataseries.js", "../dist/superdataseries.js");
+helper.setRoute("/built/main.built.js", "../examples/main.built.js");
+helper.setRoute("/chart_data/formatted50", "./data/format50.csv");
+helper.setRoute("/chart_data/formatted100", "./data/format100.csv");
+helper.setRoute("/chart_data/formatted500", "./data/format500.csv");
 
 app.listen(8888, () => {
 	console.log("Host Server is running on port 8888");
@@ -160,23 +157,3 @@ app.listen(8888, () => {
 //     res.send(reason);
 //   });
 // });
-
-function readContent(filePath, callback) {
-  readFile(filePath, "utf-8").then((content) => {
-    callback(null, content);
-  }).catch((reason) => {
-    return callback(reason);
-  });
-}
-
-function setRoute(route, path) {
-  app.get(route, (req, res) => {
-    readContent(path, (err, content) => {
-      if(err) {
-        throw err;
-      }
-
-      res.send(content);
-    });
-  });
-}
