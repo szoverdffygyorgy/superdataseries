@@ -37,3 +37,5 @@ jspm_packages
 .node_repl_history
 src/data/DAT_NT_USDHUF_T_ASK_201610.csv
 src/data/format.csv
+src/algorithms/trendFollowing/__pycache__/trendFollowin.cpython-36.pyc
+src/algorithms/trendFollowing/__pycache__/trendFollowing.cpython-36.pyc
