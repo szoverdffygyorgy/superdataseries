@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib
 from datetime import datetime
 from flask import Flask, request, make_response
+import json
 
 app = Flask("Trend Following Microservice")
 
@@ -24,14 +25,26 @@ def runAlgorithm():
     window1Series = series.rolling(window = int(request.form["window1"]))
     window2Series = series.rolling(window = int(request.form["window2"]))
 
+    series1 = window1Series.mean();
+    series2 = window2Series.mean();
+
     series.plot(style="k")
-    window1Series.mean().plot(style="r")
-    window2Series.mean().plot(style="b")
+    series1.plot(style="r")
+    series2.plot(style="b")
 
     matplotlib.pyplot.show()
 
-    series1 = pd.Series(window1Series)
-    series2 = pd.Series(window2Series)
+    #for (attr, value) in window1Series.obj.__dict__.items():
+    #    print(attr, value)
+    #series1 = pd.Series(window1Series)
+    #series2 = pd.Series(window2Series)
+    #pandas.Series.asobject.tolist()
 
-    print(series)
-    return make_response("Success", 200)
+    #pprint.pprint(window1Series.obj)
+    series1 = list(series1.iteritems())
+    series2 = list(series2.iteritems())
+
+    return make_response(json.dumps({
+        "window1": series1,
+        "window2": series2
+    }), 200)

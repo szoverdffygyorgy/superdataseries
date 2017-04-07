@@ -16,8 +16,15 @@ app.use(bodyParser.json());
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
 
-const User = mongoose.model("User", {name: String, userName: String,
- password: String, profileUrl: String, balance: Number, portfolio: Object});
+const User = mongoose.model("User",
+{
+  name: String,
+  userName: String,
+  password: String,
+  profileUrl: String,
+  balance: Number,
+  portfolio: Object
+});
 
  const DataPoint = mongoose.model("DataPoint",
  {
