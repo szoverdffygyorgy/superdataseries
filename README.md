@@ -12,7 +12,6 @@ To start influxDB navigate to InfluxDB directory and type the console command:
 To run a python service navigate to the folder containing the script and use
 the command below:
 ```
-	set FLASK_APP=<the script file + extension> //after this line the script can
-																							//be ran as a python script
-	python -m flask run
+	>> set FLASK_APP=<the script file + extension>
+	>> python -m flask run
 ```

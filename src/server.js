@@ -8,6 +8,7 @@ const http = require("http");
 const moment = require("moment");
 const Promise = require("promise");
 const helper = require("./helper.js")({promise: Promise, app: app});
+const request = require("request");
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,6 +33,14 @@ const User = mongoose.model("User",
    timeStamp: Number,
    price: Number
  });
+
+app.get("/users", (req, res) => {
+  User.find({}).exec().then((users) => {
+    res.send(users);
+  }).catch((reason) => {
+    console.log(reason);
+  });
+});
 
 app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
@@ -101,6 +110,29 @@ app.post("/seriesQuery", (req, res) => {
   }).catch((reason) => {
     throw new Error("TimeSeries data not found: " + reason);
   });
+});
+
+app.post("/runAlgorithm", (req, res) => {
+  let user = req.body.user;
+  let series = req.body.series;
+  let window1 = req.body.window1;
+  let window2 = req.body.window2;
+
+  request.post("http://127.0.0.1:5000/runAlgorithm", {
+    form: {
+      user: user,
+      series: series,
+      window1: window1,
+      window2:window2
+    }
+  }, (err, response, body) => {
+    if(err) {
+      throw new Error(err);
+    }
+
+    res.send(JSON.stringify(response));
+  });
+
 });
 
 //app.use(express.static("examples/index.html"));
