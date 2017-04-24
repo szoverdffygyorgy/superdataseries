@@ -61,11 +61,11 @@ def runAlgorithm():
     series1 = window1Series.mean();
     series2 = window2Series.mean();
 
-    series.plot(style="k")
-    series1.plot(style="r")
-    series2.plot(style="b")
+    series.plot(style = "k")
+    series1.plot(style = "r")
+    series2.plot(style = "b")
 
-    matplotlib.pyplot.show()
+    #matplotlib.pyplot.show()
 
     #for (attr, value) in window1Series.obj.__dict__.items():
     #    print(attr, value)
@@ -92,21 +92,27 @@ def runAlgorithm():
         prev = True
 
     if str(seriesName) not in user["portfolio"]:
+        print(str(seriesName))
+        print(json.dumps(user["portfolio"]))
         user["portfolio"][str(seriesName)] = 0
 
     for i in range(window2, len(series)):
         if series1[i][1] > series2[i][1] and prev is False:
             print("BUYING")
             print(json.dumps(user))
-            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / series[i][1])
-            user["balance"] -= user["portfolio"][str(seriesName)] * series[i][1]
+            ableToBuy = math.floor(user["balance"] / series[i][1])
+            print("CAN BUY: " + str(ableToBuy))
+            user["portfolio"][str(seriesName)] += math.floor(user["balance"] /
+             series[i][1])
+            user["balance"] -= ableToBuy * series[i][1]
             prev = True
             print(json.dumps(user))
 
         if series2[i][1] > series1[i][1] and prev is True:
             print("SELLING")
             print(json.dumps(user))
-            user["balance"] += user["portfolio"][str(seriesName)] * series[i][1]
+            user["balance"] += user["portfolio"][str(seriesName)] *
+             series[i][1]
             user["portfolio"][str(seriesName)] = 0
             prev = False
             print(json.dumps(user))

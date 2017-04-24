@@ -36,7 +36,7 @@ const User = mongoose.model("User",
 
 app.get("/users", (req, res) => {
   User.find({}).exec().then((users) => {
-    res.send(users);
+    res.send(JSON.stringify(users));
   }).catch((reason) => {
     console.log(reason);
   });
