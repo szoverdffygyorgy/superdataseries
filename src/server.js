@@ -132,7 +132,14 @@ app.post("/runAlgorithm", (req, res) => {
 
     res.send(JSON.stringify(response));
   });
+});
 
+app.get("/seriesNames", (req, res) => {
+  DataPoint.find().distinct("seriesName").exec().then((seriesNames) => {
+    res.send(JSON.stringify(seriesNames));
+  }).catch((reason) => {
+    res.send("Query failed due to: " + reason);
+  });
 });
 
 //app.use(express.static("examples/index.html"));
