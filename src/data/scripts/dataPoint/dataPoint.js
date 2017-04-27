@@ -4,16 +4,10 @@ const moment = require("moment");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const Promise = require("promise");
+const DataPoint = require("../../models/dataPoint");
 
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
-
-const DataPoint = mongoose.model("DataPoint",
-{
-  seriesName: String,
-  timeStamp: Number,
-  price: Number
-});
 
 let readFile = Promise.denodeify(fs.readFile);
 

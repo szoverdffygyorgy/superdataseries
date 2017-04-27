@@ -10,6 +10,10 @@ const Promise = require("promise");
 const helper = require("./helper.js")({promise: Promise, app: app});
 const request = require("request");
 
+const User = require("./data/models/user");
+const DataPoint = require("./data/models/dataPoint");
+const TradingHistory = require("./data/models/tradingHistory");
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -17,28 +21,36 @@ app.use(bodyParser.json());
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
 
-const User = mongoose.model("User",
-{
-  name: String,
-  userName: String,
-  password: String,
-  profileUrl: String,
-  balance: Number,
-  portfolio: Object
-});
-
- const DataPoint = mongoose.model("DataPoint",
- {
-   seriesName: String,
-   timeStamp: Number,
-   price: Number
- });
-
 app.get("/users", (req, res) => {
   User.find({}).exec().then((users) => {
     res.send(JSON.stringify(users));
   }).catch((reason) => {
     console.log(reason);
+  });
+});
+
+app.get("/series", (req, res) => {
+  DataPoint.find({}).exec()
+  .then((series) => {
+    res.send(JSON.stringify(series));
+  }).catch((reason) => {
+    throw new Error("No TimeSeries found: " + reason);
+  });
+});
+
+app.get("/seriesNames", (req, res) => {
+  DataPoint.find().distinct("seriesName").exec().then((seriesNames) => {
+    res.send(JSON.stringify(seriesNames));
+  }).catch((reason) => {
+    res.send("Query failed due to: " + reason);
+  });
+});
+
+app.get("/tradingHistory", (req, res) => {
+  TradingHistory.find({}).exec().then((history) => {
+    res.send(JSON.stringify(history));
+  }).catch((reason) => {
+    res.send("Query failed due to: " + reason);
   });
 });
 
@@ -89,15 +101,6 @@ app.post("/transaction", (req, res) => {
   });
 });
 
-app.get("/series", (req, res) => {
-  DataPoint.find({}).exec()
-  .then((series) => {
-    res.send(JSON.stringify(series));
-  }).catch((reason) => {
-    throw new Error("No TimeSeries found: " + reason);
-  });
-});
-
 app.post("/seriesQuery", (req, res) => {
   let from = parseInt(req.body.from) - 1 || -1;
   let to = parseInt(req.body.to) + 1 || parseInt(moment().unix()) + 1;
@@ -131,14 +134,6 @@ app.post("/runAlgorithm", (req, res) => {
     }
 
     res.send(JSON.stringify(response));
-  });
-});
-
-app.get("/seriesNames", (req, res) => {
-  DataPoint.find().distinct("seriesName").exec().then((seriesNames) => {
-    res.send(JSON.stringify(seriesNames));
-  }).catch((reason) => {
-    res.send("Query failed due to: " + reason);
   });
 });
 

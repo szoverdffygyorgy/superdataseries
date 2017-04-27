@@ -18,6 +18,7 @@ def runAlgorithm():
     print(database.collection_names())
     dataPoints = database["datapoints"]
     users = database["users"]
+    tradingHistories = database["trading histories"]
 
 
     for key in list(request.__dict__["environ"]["werkzeug.request"].__dict__):
@@ -102,17 +103,29 @@ def runAlgorithm():
             print(json.dumps(user))
             ableToBuy = math.floor(user["balance"] / series[i][1])
             print("CAN BUY: " + str(ableToBuy))
-            user["portfolio"][str(seriesName)] += math.floor(user["balance"] /
-             series[i][1])
+            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / series[i][1])
             user["balance"] -= ableToBuy * series[i][1]
             prev = True
+            tradingHistories.insert_one({
+                "user": user,
+                "series": seriesName,
+                "price": series[i][1],
+                "amountOfInstrument": ableToBuy,
+                "transactionType": "buy"
+            })
             print(json.dumps(user))
 
         if series2[i][1] > series1[i][1] and prev is True:
             print("SELLING")
             print(json.dumps(user))
-            user["balance"] += user["portfolio"][str(seriesName)] *
-             series[i][1]
+            tradingHistories.insert_one({
+                "user": user,
+                "series": seriesName,
+                "price": series[i][1],
+                "amountOfInstrument": user["portfolio"][str(seriesName)],
+                "transactionType": "sell"
+            })
+            user["balance"] += user["portfolio"][str(seriesName)] * series[i][1]
             user["portfolio"][str(seriesName)] = 0
             prev = False
             print(json.dumps(user))

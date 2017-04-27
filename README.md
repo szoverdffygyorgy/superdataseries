@@ -14,4 +14,6 @@ the command below:
 ```
 	>> set FLASK_APP=<the script file + extension>
 	>> python -m flask run
+	or
+	>> flask run -h <hostname> -p <port number> // this is seems to be better
 ```
