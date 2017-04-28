@@ -13,6 +13,7 @@ const request = require("request");
 const User = require("./data/models/user");
 const DataPoint = require("./data/models/dataPoint");
 const TradingHistory = require("./data/models/tradingHistory");
+const Algorithm = require("./data/models/algorithm");
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -50,6 +51,15 @@ app.get("/tradingHistory", (req, res) => {
   TradingHistory.find({}).exec().then((history) => {
     res.send(JSON.stringify(history));
   }).catch((reason) => {
+    res.send(JSON.stringify(algorithms));
+  });
+  res.send("Query failed due to: " + reason);
+});
+
+app.get("/algorithms", (req, res) => {
+  Algorithm.find({}).exec().then((algorithms) => {
+    res.send(JSON.stringify(algorithms));
+  }).catch((reason) => {
     res.send("Query failed due to: " + reason);
   });
 });
@@ -58,8 +68,10 @@ app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
   let password = req.body.pass;
 
-  User.findOne({"userName": userName, "password": password}).exec()
-  .then((user) => {
+  User.findOne({
+    "userName": userName,
+    "password": password
+  }).exec().then((user) => {
     console.log(user);
     let response = {
       userName: user.userName,
@@ -79,8 +91,9 @@ app.post("/transaction", (req, res) => {
   let transactionType = req.body.transactionType;
   let transactionValue = parseInt(req.body.transactionValue);
 
-  User.findOne({"userName": userName}).exec()
-  .then((user) => {
+  User.findOne({
+    "userName": userName
+  }).exec().then((user) => {
     if(transactionType === "buy") {
       user.balance -= transactionValue;
     } else if(transactionType === "sell") {
@@ -106,8 +119,13 @@ app.post("/seriesQuery", (req, res) => {
   let to = parseInt(req.body.to) + 1 || parseInt(moment().unix()) + 1;
   let seriesName = req.body.series;
 
-  DataPoint.find({"seriesName": seriesName, "timeStamp": {$gt: from, $lt: to}})
-  .exec().then((dataPoints) => {
+  DataPoint.find({
+    "seriesName": seriesName,
+    "timeStamp": {
+      $gt: from,
+      $lt: to
+    }
+  }).exec().then((dataPoints) => {
     console.log(dataPoints);
     res.send(JSON.stringify(dataPoints));
   }).catch((reason) => {
@@ -117,23 +135,33 @@ app.post("/seriesQuery", (req, res) => {
 
 app.post("/runAlgorithm", (req, res) => {
   let user = req.body.user;
-  let series = req.body.series;
-  let window1 = req.body.window1;
-  let window2 = req.body.window2;
+  let algorithmName = req.body.algorithm;
+  let params = req.body.params;
 
-  request.post("http://127.0.0.1:5000/runAlgorithm", {
-    form: {
-      user: user,
-      series: series,
-      window1: window1,
-      window2:window2
-    }
-  }, (err, response, body) => {
-    if(err) {
-      throw new Error(err);
-    }
+  console.log("LOOKING FOR: " + algorithmName);
 
-    res.send(JSON.stringify(response));
+  Algorithm.find({name: algorithmName}).exec().then((algorithm) => {
+    let algorithmObject = JSON.parse(algorithm);
+
+    let serviceUrl = "http://" + algorithmObject.host + ":" +
+     algorithmObject.port + "/" + algorithmObject.route;
+
+    console.log("Attempting to connect to: " + serviceUrl);
+
+    request.post(serviceUrl, {
+      form: {
+        user: user,
+        params: params
+      }
+    }, (err, response, body) => {
+      if(err) {
+        throw new Error(err);
+      }
+
+      res.send(JSON.stringify(response));
+    });
+  }).catch((reason) => {
+    res.send("Algorithm: " + algorithmName + " NOT FOUND");
   });
 });
 
