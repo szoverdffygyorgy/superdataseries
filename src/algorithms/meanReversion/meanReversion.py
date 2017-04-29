@@ -20,6 +20,8 @@ def runAlgorithm():
     users = database["users"]
     tradingHistories = database["trading histories"]
 
+    print(json.dumps(request.form))
+
     userName = request.form["user"]
     seriesName = request.form["series"]
     window = int(request.form["window"])
