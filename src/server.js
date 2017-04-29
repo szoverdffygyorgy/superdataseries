@@ -30,12 +30,22 @@ app.get("/users", (req, res) => {
   });
 });
 
-app.get("/series", (req, res) => {
+app.get("/dataPoints", (req, res) => {
   DataPoint.find({}).exec()
   .then((series) => {
     res.send(JSON.stringify(series));
   }).catch((reason) => {
     throw new Error("No TimeSeries found: " + reason);
+  });
+});
+
+app.get("/dataPoints/:seriesName", (req, res) => {
+  DataPoint.find({
+    "seriesName": req.params.seriesName
+  }).exec().then((series) => {
+    res.send(JSON.stringify(series))
+  }).catch((reason) => {
+    res.send("NOT FOUND");
   });
 });
 
