@@ -21,11 +21,13 @@ def runAlgorithm():
     tradingHistories = database["trading histories"]
 
 
-    for key in list(request.__dict__["environ"]["werkzeug.request"].__dict__):
-        print(key, request.__dict__["environ"]["werkzeug.request"].__dict__[key])
+    #for key in list(request.__dict__["environ"]["werkzeug.request"].__dict__):
+    #    print(key, request.__dict__["environ"]["werkzeug.request"].__dict__[key])
 
-    print(request.get_data())
+    print(json.dumps(request.form))
 
+    #params = request.form["params"]
+    #print(type(params))
     userName = request.form["user"]
     seriesName = request.form["series"]
     window1 = int(request.form["window1"])

@@ -64,6 +64,17 @@ app.get("/algorithms", (req, res) => {
   });
 });
 
+app.get("/algorithms/:algorithmName", (req, res) => {
+  let split = req.params.algorithmName.split("_");
+  Algorithm.findOne({
+    "name": split[0] + " " + split[1]
+  }).exec().then((algorithm) => {
+    res.send(JSON.stringify(algorithm));
+  }).catch((reason) => {
+    res.send("NOT FOUND");
+  });
+});
+
 app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
   let password = req.body.pass;
@@ -134,25 +145,36 @@ app.post("/seriesQuery", (req, res) => {
 });
 
 app.post("/runAlgorithm", (req, res) => {
-  let user = req.body.user;
-  let algorithmName = req.body.algorithm;
+  let algorithmName = req.body.algorithmName;
   let params = req.body.params;
 
   console.log("LOOKING FOR: " + algorithmName);
+  console.log("ALGORITHM PARAMS: " + JSON.stringify(params));
 
-  Algorithm.find({name: algorithmName}).exec().then((algorithm) => {
-    let algorithmObject = JSON.parse(algorithm);
+  Algorithm.findOne({
+    "name": algorithmName
+  }).exec().then((algorithm) => {
+    console.log(JSON.stringify(algorithm));
+    let serviceUrl = "http://" + algorithm.host + ":" +
+     algorithm.port + "/" + algorithm.route;
+    let form = {};
 
-    let serviceUrl = "http://" + algorithmObject.host + ":" +
-     algorithmObject.port + "/" + algorithmObject.route;
+    /*params.forEach((prop) => {
+      console.log("property: " + prop);
+      console.log(JSON.stringify(form));
+      form.prop = params.prop;
+    });*/
+    for(let prop in params) {
+      console.log("property: " + prop);
+      console.log(JSON.stringify(form));
+      form[prop] = params[prop];
+    }
 
+    console.log("form: " + JSON.stringify(form));
     console.log("Attempting to connect to: " + serviceUrl);
 
     request.post(serviceUrl, {
-      form: {
-        user: user,
-        params: params
-      }
+      form: form
     }, (err, response, body) => {
       if(err) {
         throw new Error(err);
