@@ -43,7 +43,17 @@ app.get("/dataPoints/:seriesName", (req, res) => {
   DataPoint.find({
     "seriesName": req.params.seriesName
   }).exec().then((series) => {
-    res.send(JSON.stringify(series))
+    let response = [];
+
+    series.forEach((point) => {
+      response.push({
+        //time: moment(point.timeStamp).format("MMM Do, h:mm:ss:SSS"),
+        time: parseInt(point.timeStamp * 1000),
+        price: point.price
+      });
+    });
+
+    res.send(JSON.stringify(response));
   }).catch((reason) => {
     res.send("NOT FOUND");
   });
@@ -200,6 +210,7 @@ app.post("/runAlgorithm", (req, res) => {
 //app.use(express.static("examples/index.html"));
 
 helper.setRoute("/", "../examples/index.html");
+helper.setRoute("/chartTest", "../examples/chartTest.html");
 helper.setRoute("/chart_data/test_data", "./data/csv_test.csv");
 helper.setRoute("/chart_data/forex_data_test", "./data/test_data.csv");
 helper.setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");

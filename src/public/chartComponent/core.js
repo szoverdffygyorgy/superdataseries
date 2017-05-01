@@ -26,15 +26,17 @@ module.exports = function(dependencies) {
 		var chart = c3.generate({
 			bindto: "#" + divId,
 			data: {
-				x: "x",
-				xFormat: "%Y-%m-%d %H:%M:%S",
-				mimeType: "csv",
+				//x: "testSeries",
+				//xFormat: "%Y-%m-%d %H:%M:%S",
+				mimeType: "json",
 				url: chartUrl,
-				groups: [
+				/*groups: [
 					["HUF/USD"]
-				],
+				],*/
 				keys: {
-					xFormat: "%Y-%m-%d %H:%M:%S"
+					x: "time",
+					value: ["price"]
+					//xFormat: "%Y-%m-%d %H:%M:%S"
 				}
 
 			},
