@@ -12,32 +12,43 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
-		if(!config.url) {
-			throw new Error("config.url is mandatory!");
+		if(!config.seriesUrl && typeof config.seriesUrl !== "string") {
+			throw new Error("config.seriesUrl is mandatory and should be a string!");
 		}
 
-		if(!config.divId) {
-			throw new Error("config.divId is mandatory!");
+		if(!config.divId && typeof config.divId !== "string") {
+			throw new Error("config.divId is mandatory and should be a string!");
 		}
 
-		var chartUrl = config.url;
-		var urlSplit = chartUrl.split("/");
-		var seriesName = urlSplit[urlSplit.length - 1];
+		if(!config.baseRoute && typeof config.baseRoute !== "string") {
+			throw new Error("config.baseRoute is mandatory and should be a string!");
+		}
+
+		if(!config.selectedSymbol && typeof config.selectedSymbol !== "function") {
+			throw new Error("config.selectedSymbol is mandatory and should be a knockout observable!");
+		}
+
+		//var chartUrl = config.url;
+		var selectedSymbol = config.selectedSymbol;
 		var divId = config.divId;
+		var seriesUrl = config.seriesUrl;
+		var baseRoute = config.baseRoute;
+
+		var chartUrl = "./" + seriesUrl + "/" + selectedSymbol().label();
 
 		var chart = c3.generate({
 			bindto: "#" + divId,
 			data: {
 				//x: "testSeries",
 				//xFormat: "%Y-%m-%d %H:%M:%S",
-				mimeType: "json",
 				url: chartUrl,
+				mimeType: "json",
 				/*groups: [
 					["HUF/USD"]
 				],*/
 				keys: {
 					x: "time",
-					value: [seriesName]
+					value: [selectedSymbol().label()]
 					//xFormat: "%Y-%m-%d %H:%M:%S"
 				}
 
@@ -56,7 +67,10 @@ module.exports = function(dependencies) {
 						position: "middle"
 					},
 					tick: {
-						format: "%M:%S"
+						format: "%Y-%m-%d %H:%M:%S", //"%M:%S",
+						culling: {
+							max: 7
+						}
 					}
 				}
 			},

@@ -86,6 +86,14 @@ app.get("/algorithms", (req, res) => {
   });
 });
 
+app.get("/algorithmNames", (req, res) => {
+  Algorithm.find().distinct("name").exec().then((algorithmNames) => {
+    res.send(JSON.stringify(algorithmNames));
+  }).catch((reason) => {
+    res.send("Query failed due to: " + reason);
+  });
+});
+
 app.get("/algorithms/:algorithmName", (req, res) => {
   let split = req.params.algorithmName.split("_");
   Algorithm.findOne({

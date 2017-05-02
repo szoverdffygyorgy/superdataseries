@@ -87,6 +87,11 @@ def runAlgorithm():
 
     matplotlib.pyplot.show()
 
+    if str(seriesName) not in user["portfolio"]:
+        print(str(seriesName))
+        print(json.dumps(user["portfolio"]))
+        user["portfolio"][str(seriesName)] = 0
+
     for index in range(window, len(series)):
         if seriesList[index][1] > upperBound[seriesList[index][0]]:
             print("SELLING")
@@ -104,8 +109,8 @@ def runAlgorithm():
         if seriesList[index][1] < lowerBound[seriesList[index][0]]:
             print("BUYING")
             ableToBuy = math.floor(user["balance"] / seriesList[index][1])
-            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / series[i][1])
-            user["balance"] -= ableToBuy * seriesList[i][1]
+            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / series[index][1])
+            user["balance"] -= ableToBuy * seriesList[index][1]
             tradingHistories.insert_one({
                 "user": user,
                 "series": seriesName,

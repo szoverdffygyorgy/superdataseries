@@ -13,13 +13,23 @@ module.exports = function(dependencies) {
 		config = config || {};
 
 		if(!config.baseRoute && typeof config.baseRoute !== "string") {
-			throw new Error("dependencies.baseRoute is mandatory and should be a string!");
+			throw new Error("config.baseRoute is mandatory and should be a string!");
 		}
 
-		const baseRoute = config.baseRoute;
-		
+		if(!config.symbols && typeof config.symbols !== "array") {
+			throw new Error("config.symbols is mandatory and should be an array!");
+		}
+
+		if(!config.selectedSymbol && typeof config.selectedSymbol !== "function") {
+			throw new Error("config.selectedSymbol is mandatory and should be a knockout observable!");
+		}
+
 		const dropdownLabel = "Stocks: ";
-		var symbols = ko.observableArray([
+		const baseRoute = config.baseRoute;
+		const seriesQueryUrl = config.seriesQueryUrl;
+		let symbols = config.symbols;
+		let selectedSymbol = config.selectedSymbol;
+		/*var symbols = ko.observableArray([
 			{
 				label: "Google",
 				value: "SYMBOL1"
@@ -32,22 +42,21 @@ module.exports = function(dependencies) {
 				label: "Verzion",
 				value: "SYMBOL3"
 			}
-		]);
+		]);*/
 
-		var selected = ko.observable(null);
 		var selectedIdx = ko.observable(null);
 
 		var loadChart = {
 			label: "Select",
 			click: function() {
-				location.hash = location.hash + "/" + selected().value
+				location.hash = location.hash + "/" + selectedSymbol().value;
 			}
 		}
 
 		return {
 			dropdownLabel: dropdownLabel,
 			symbols: symbols,
-			selected: selected,
+			selectedSymbol: selectedSymbol,
 			selectedIdx: selectedIdx,
 			loadChart: loadChart
 		};

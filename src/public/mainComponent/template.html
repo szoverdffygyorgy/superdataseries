@@ -31,13 +31,17 @@
 <div data-bind="if: resource() === 'charts' && symbol() == null && user() !== null">
 	<chart-chooser params="
 		user: user,
-		baseRoute: baseRoute
+		baseRoute: baseRoute,
+    symbols: symbols,
+    selectedSymbol: selectedSymbol
 	"></chart-chooser>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() != null && user() != null">
 	<chart-component params="
 			user: user,
-			url: './chart_data/formatted50',
-			divId: 'format50'
+			seriesUrl: seriesUrl,
+			divId: 'chart',
+      baseRoute: baseRoute,
+      selectedSymbol: selectedSymbol
 		"></chart-component>
 </div>

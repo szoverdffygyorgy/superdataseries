@@ -3,7 +3,7 @@
 module.exports = function(dependencies) {
 	if(!dependencies) {
 		throw new Error("dependencies is mandatory!");
-	} 
+	}
 
 	if(!dependencies.ko) {
 		throw new Error("dependencies.ko is mandatory!");
@@ -15,6 +15,46 @@ module.exports = function(dependencies) {
 		config = config || {};
 
 		const baseRoute = "localhost:8888";
+		const seriesQueryUrl = "./seriesNames";
+		const algorithmQueryUrl = "./algorithmNames";
+		const seriesUrl = "dataPoints";
+		const runAlgorithm = "./runAlgorithm";
+
+		let symbols = ko.observableArray([]);
+		let selectedSymbol = ko.observable(null);
+
+		let algorithms = ko.observableArray([]);
+		let selectedAlgorithm = ko.observable(null);
+
+		ko.computed(() => {
+			console.log(selectedSymbol())
+		})
+
+		let xhr = new XMLHttpRequest();
+		xhr.open("GET", seriesQueryUrl);
+		xhr.onreadystatechange = () => {
+			if(xhr.readyState === 4 && xhr.status === 200) {
+				let parsedData = JSON.parse(xhr.responseText);
+
+				parsedData.forEach((series) => {
+					symbols.push({
+						label: series,
+						value: series.toUpperCase()
+					});
+				});
+			}
+		}
+
+		xhr.send(null);
+
+		xhr = new XMLHttpRequest();
+		xhr.open("GET", algorithmQueryUrl);
+		xhr.onreadystatechange = () => {
+			if(xhr.readyState === 4 && xhr.status === 200) {
+				let parsedData = JSON.parse(xhr.responseText);
+				algorithms(parsedData);
+			}
+		}
 
 		function createMenuItem(label, url) {
 			return {
@@ -95,8 +135,12 @@ module.exports = function(dependencies) {
 			menu: menu,
 			resource: resource,
 			symbol: symbol,
+			selectedSymbol: selectedSymbol,
+			symbols: symbols,
 			baseRoute: baseRoute,
-			user: user
+			user: user,
+			seriesQueryUrl: seriesQueryUrl,
+			seriesUrl: seriesUrl
 		};
 	};
 };

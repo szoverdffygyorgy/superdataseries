@@ -96,8 +96,13 @@
 		</symbol></svg>
     <chart-component params="
   			user: ko.observable(null),
-  			url: './dataPoints/testSeries1',
-  			divId: 'test'
+  			baseRoute: 'localhost:8888',
+				selectedSymbol: ko.observable({
+					value: 'TESTSERIES',
+					label: ko.observable('testSeries')
+				}),
+  			divId: 'test',
+				seriesUrl: 'dataPoints'
   		"></chart-component>
 		<!--<login-surface></login-surface>
 		<chart-component params="
