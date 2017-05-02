@@ -21,6 +21,8 @@ module.exports = function(dependencies) {
 		}
 
 		var chartUrl = config.url;
+		var urlSplit = chartUrl.split("/");
+		var seriesName = urlSplit[urlSplit.length - 1];
 		var divId = config.divId;
 
 		var chart = c3.generate({
@@ -35,7 +37,7 @@ module.exports = function(dependencies) {
 				],*/
 				keys: {
 					x: "time",
-					value: ["price"]
+					value: [seriesName]
 					//xFormat: "%Y-%m-%d %H:%M:%S"
 				}
 

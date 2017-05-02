@@ -46,11 +46,13 @@ app.get("/dataPoints/:seriesName", (req, res) => {
     let response = [];
 
     series.forEach((point) => {
-      response.push({
-        //time: moment(point.timeStamp).format("MMM Do, h:mm:ss:SSS"),
-        time: parseInt(point.timeStamp * 1000),
-        price: point.price
-      });
+      let temp = {
+        time: parseInt(point.timeStamp * 1000)
+      }
+
+      temp[req.params.seriesName] = point.price;
+
+      response.push(temp);
     });
 
     res.send(JSON.stringify(response));
