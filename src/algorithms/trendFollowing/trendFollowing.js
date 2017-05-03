@@ -23,6 +23,7 @@ trendFollowing.params = {
 
 trendFollowing.save().then((success) => {
   console.log("Algorithm added! " + success);
+  mongoose.disconnect();
 }).catch((reason) => {
   console.log("Insertion failed because: " + reason);
 });

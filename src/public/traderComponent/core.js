@@ -12,11 +12,16 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
-		if(config.user === null) {
-			throw new Error("config.user is mandatory!");
+		if(!config.user && typeof config.user !== "function") {
+			throw new Error("config.user is mandatory and should be a knockout observable!");
+		}
+
+		if(!config.symbols && typeof config.symbols !== "array") {
+			throw new Error("config.symbols is mandatory and should be an array!");
 		}
 
 		var user = config.user;
+		var symbols = config.symbols;
 
 		const header = "Trade";
 		const symbolLabel = "Symbol ";
@@ -26,24 +31,11 @@ module.exports = function(dependencies) {
 		var symbolsDropdown = {
 			selectedSymbol: ko.observable(null),
 			selectedSymbolIdx: ko.observable(null),
-			symbols: ko.observableArray([
-				{
-					label: "Google",
-					value: "GOOG"
-				},
-				{
-					label: "Apple",
-					value: "AAPL"
-				},
-				{
-					label: "Verzion",
-					value: "VZ"
-				}
-			])
+			symbols: symbols
 		};
 
-		var transactionValue = ko.observable(0);
-		
+		var quantity = ko.observable(0);
+
 		var optionsDropdown = {
 			selectedOption: ko.observable(null),
 			selectedOptionIdx: ko.observable(null),
@@ -56,34 +48,39 @@ module.exports = function(dependencies) {
 					label: "Sell",
 					value: "sell"
 				}
-			])		
+			])
 		};
 
 		var transactionButton = {
 			label: "Make transaction",
 			click: function() {
 				console.log("Attempting to " + optionsDropdown.selectedOption().value +
-				 " " + transactionValue() + " stocks" +
+				 " " + quantity() + " stocks" +
 				 " from " + symbolsDropdown.selectedSymbol().label() + " with the symbol: " +
 				  symbolsDropdown.selectedSymbol().value);
 
 				var post = new XMLHttpRequest();
-				var tradeParams = "user=" + user().userName + "&transactionType=" +
-				 optionsDropdown.selectedOption().value + "&transactionValue=" + transactionValue();
-
 				 post.open("POST", "./transaction", true);
 
 				 post.onreadystatechange = function() {
 				 	if(post.readyState == 4, post.status == 200) {
-				 		var modifiedBalaneUser = user();
-				 		modifiedBalaneUser.balance = post.responseText;
-				 		user(modifiedBalaneUser);
-				 		location.hash = "/users/" + user().userName;
+						let responseObject = JSON.parse(post.responseText);
+
+						if(!responseObject.ok) {
+							console.log(responseObject.error);
+						} else {
+							user(responseObject.result);
+						}
 				 	}
 				 }
 
-				 post.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				 post.send(tradeParams);
+				 post.setRequestHeader("Content-type", "application/json");
+				 post.send(JSON.stringify({
+					 user: user().userName,
+					 transactionType: optionsDropdown.selectedOption().value,
+					 quantity: quantity(),
+					 seriesName: symbolsDropdown.selectedSymbol().label()
+				 }));
 			}
 		};
 
@@ -95,7 +92,7 @@ module.exports = function(dependencies) {
 			symbolsDropdown: symbolsDropdown,
 			optionsDropdown: optionsDropdown,
 			transactionButton: transactionButton,
-			transactionValue: transactionValue
+			quantity: quantity
 		};
 	};
 };

@@ -25,14 +25,15 @@
 </div>
 <div data-bind="if: resource() === 'trade' && user() != null">
 	<trader-component params="
-		user: user
+		user: user,
+    symbols: symbols.traderComponent
 	"></trader-component>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() == null && user() !== null">
 	<chart-chooser params="
 		user: user,
 		baseRoute: baseRoute,
-    symbols: symbols,
+    symbols: symbols.chartChooser,
     selectedSymbol: selectedSymbol
 	"></chart-chooser>
 </div>

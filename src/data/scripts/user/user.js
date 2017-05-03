@@ -23,6 +23,13 @@ for(let i = 0; i < 10; i += 1) {
 
 	user.save().then((success) => {
     console.log("Successful insert: " + success);
+		User.find().count().exec().then((count) => {
+			if(count === 10) {
+				mongoose.disconnect();
+			}
+		}).catch((reason) => {
+			throw new Error("Error in querying the number of elements in collection " + reason);
+		});
   }).catch((reason) => {
     throw new Error("Insertion was not Successful due to: " + reason);
   });

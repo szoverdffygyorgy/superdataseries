@@ -23,15 +23,26 @@ mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
 
 app.get("/users", (req, res) => {
-  User.find({}).exec().then((users) => {
-    res.send(JSON.stringify(users));
+  User.find({})
+  .exec()
+  .then((users) => {
+    res.status(200).send(JSON.stringify({
+      result: users,
+      ok: true,
+      error: false
+    }));
   }).catch((reason) => {
-    console.log(reason);
+    res.status(404).send(JSON.stringify({
+      error: "Query failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
 app.get("/dataPoints", (req, res) => {
-  DataPoint.find({}).exec()
+  DataPoint.find({})
+  .exec()
   .then((series) => {
     res.send(JSON.stringify(series));
   }).catch((reason) => {
@@ -42,7 +53,8 @@ app.get("/dataPoints", (req, res) => {
 app.get("/dataPoints/:seriesName", (req, res) => {
   DataPoint.find({
     "seriesName": req.params.seriesName
-  }).exec().then((series) => {
+  }).exec()
+  .then((series) => {
     let response = [];
 
     series.forEach((point) => {
@@ -57,29 +69,43 @@ app.get("/dataPoints/:seriesName", (req, res) => {
 
     res.send(JSON.stringify(response));
   }).catch((reason) => {
-    res.send("NOT FOUND");
+    res.send("Request failed due to: " + reason);
   });
 });
 
 app.get("/seriesNames", (req, res) => {
-  DataPoint.find().distinct("seriesName").exec().then((seriesNames) => {
-    res.send(JSON.stringify(seriesNames));
+  DataPoint.find()
+  .distinct("seriesName")
+  .exec()
+  .then((seriesNames) => {
+    res.status(200).send({
+      result: JSON.stringify(seriesNames),
+      ok: true,
+      error: null
+    });
+  }).catch((reason) => {
+    res.status(404).send({
+      error: "Query failed due to: " + reason,
+      ok: false,
+      result: null
+    });
+  });
+});
+
+app.get("/tradingHistory", (req, res) => {
+  TradingHistory.find({})
+  .exec()
+  .then((history) => {
+    res.send(JSON.stringify(history));
   }).catch((reason) => {
     res.send("Query failed due to: " + reason);
   });
 });
 
-app.get("/tradingHistory", (req, res) => {
-  TradingHistory.find({}).exec().then((history) => {
-    res.send(JSON.stringify(history));
-  }).catch((reason) => {
-    res.send(JSON.stringify(algorithms));
-  });
-  res.send("Query failed due to: " + reason);
-});
-
 app.get("/algorithms", (req, res) => {
-  Algorithm.find({}).exec().then((algorithms) => {
+  Algorithm.find({})
+  .exec()
+  .then((algorithms) => {
     res.send(JSON.stringify(algorithms));
   }).catch((reason) => {
     res.send("Query failed due to: " + reason);
@@ -87,10 +113,21 @@ app.get("/algorithms", (req, res) => {
 });
 
 app.get("/algorithmNames", (req, res) => {
-  Algorithm.find().distinct("name").exec().then((algorithmNames) => {
-    res.send(JSON.stringify(algorithmNames));
+  Algorithm.find()
+  .distinct("name")
+  .exec()
+  .then((algorithmNames) => {
+    res.status(200).send(JSON.stringify({
+      result: algorithmNames,
+      ok: true,
+      error: false
+    }));
   }).catch((reason) => {
-    res.send("Query failed due to: " + reason);
+    res.status.send(JSON.stringify({
+      error: "Query failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -98,7 +135,8 @@ app.get("/algorithms/:algorithmName", (req, res) => {
   let split = req.params.algorithmName.split("_");
   Algorithm.findOne({
     "name": split[0] + " " + split[1]
-  }).exec().then((algorithm) => {
+  }).exec()
+  .then((algorithm) => {
     res.send(JSON.stringify(algorithm));
   }).catch((reason) => {
     res.send("NOT FOUND");
@@ -112,7 +150,8 @@ app.post("/loginrequest", (req, res) => {
   User.findOne({
     "userName": userName,
     "password": password
-  }).exec().then((user) => {
+  }).exec()
+  .then((user) => {
     console.log(user);
     let response = {
       userName: user.userName,
@@ -130,28 +169,75 @@ app.post("/loginrequest", (req, res) => {
 app.post("/transaction", (req, res) => {
   let userName = req.body.user;
   let transactionType = req.body.transactionType;
-  let transactionValue = parseInt(req.body.transactionValue);
+  let quantity = parseInt(req.body.quantity);
+  let seriesName = req.body.seriesName;
 
-  User.findOne({
-    "userName": userName
-  }).exec().then((user) => {
-    if(transactionType === "buy") {
-      user.balance -= transactionValue;
-    } else if(transactionType === "sell") {
-      user.balance += transactionValue;
-    } else {
-      throw new Error("Invalid transactionType:" + transactionType);
-    }
+  console.log(userName, transactionType, quantity, seriesName);
 
-    user.save().then((success) => {
-      console.log("Updated user: " + success);
+  DataPoint.find({
+    seriesName: seriesName
+  }).sort({
+    timeStamp: "desc"
+  }).limit(1)
+  .select("price")
+  .exec()
+  .then((lastPrice) => {
+    User.findOne({
+      "userName": userName
+    }).exec()
+    .then((user) => {
+      console.log(user, user.portfolio.hasOwnProperty(seriesName));
+      if(transactionType === "buy") {
+        if(user.balance < quantity * lastPrice[0].price) {
+          throw new Error("Not enough balance (" + user.balance +
+           "). Cost of Transaction: ");
+         } else {
+           user.balance -= quantity * lastPrice[0].price;
+           if(user.portfolio.hasOwnProperty(seriesName)) {
+             user.portfolio[seriesName] += quantity
+           } else {
+             user.portfolio[seriesName] = quantity;
+           }
+         }
+      } else if(transactionType === "sell") {
+        if(!user.portfolio[seriesName] && user.portfolio[seriesName] < quantity) {
+          throw new Error("Not enough instruments to sell (" +
+           user.portfolio[seriesName] + ").");
+        } else {
+          user.balance += quantity * lastPrice[0].price;
+          user.portfolio[seriesName] -= quantity;
+        }
+      } else {
+          throw new Error("Invalid transactionType:" + transactionType);
+      }
+
+      user.save().then((success) => {
+        console.log("Updated user: " + success);
+        res.status(200).send(JSON.stringify({
+          result: user,
+          ok: true,
+          error: null
+        }));
+      }).catch((reason) => {
+        res.status(404).send(JSON.stringify({
+          error: "Update failed: " + reason,
+          ok: false,
+          result: null
+        }));
+      });
     }).catch((reason) => {
-      throw new Error("Update failed: " + reason);
+      res.status(404).send(JSON.stringify({
+        error: "Transaction failed: " + reason,
+        ok: false,
+        result: null
+      }));
     });
-
-    res.send(JSON.stringify(user.balance));
   }).catch((reason) => {
-    throw new Error("Transaction failed: " + reason);
+    res.status(404).send({
+      error:"Query failed due to: " + reason,
+      ok: false,
+      result: null
+    });
   });
 });
 
@@ -166,7 +252,8 @@ app.post("/seriesQuery", (req, res) => {
       $gt: from,
       $lt: to
     }
-  }).exec().then((dataPoints) => {
+  }).exec()
+  .then((dataPoints) => {
     console.log(dataPoints);
     res.send(JSON.stringify(dataPoints));
   }).catch((reason) => {
@@ -183,7 +270,8 @@ app.post("/runAlgorithm", (req, res) => {
 
   Algorithm.findOne({
     "name": algorithmName
-  }).exec().then((algorithm) => {
+  }).exec()
+  .then((algorithm) => {
     console.log(JSON.stringify(algorithm));
     let serviceUrl = "http://" + algorithm.host + ":" +
      algorithm.port + "/" + algorithm.route;

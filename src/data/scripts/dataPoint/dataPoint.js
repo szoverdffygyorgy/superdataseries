@@ -33,6 +33,14 @@ readFile("../../historicalData/" + fileName + ".csv", {
       "price": price
     }).save().then((success) => {
       console.log("Insertion Successful: " + success);
+
+      DataPoint.find().count().exec().then((count) => {
+        if(count === data.length - 1) {
+          mongoose.disconnect();
+        }
+      }).catch((reason) => {
+        throw new Error("Error in querying the number of elements in collection " + reason);
+      });
     }).catch((reason) => {
       throw new Error("Error during insertion: " + reason);
     });

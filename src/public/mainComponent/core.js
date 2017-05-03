@@ -15,12 +15,15 @@ module.exports = function(dependencies) {
 		config = config || {};
 
 		const baseRoute = "localhost:8888";
-		const seriesQueryUrl = "./seriesNames";
+		const seriesQueryUrl = "/seriesNames";
 		const algorithmQueryUrl = "./algorithmNames";
 		const seriesUrl = "dataPoints";
 		const runAlgorithm = "./runAlgorithm";
 
-		let symbols = ko.observableArray([]);
+		let symbols = {
+			chartChooser: ko.observableArray([]),
+			traderComponent: ko.observableArray([])
+		};
 		let selectedSymbol = ko.observable(null);
 
 		let algorithms = ko.observableArray([]);
@@ -30,31 +33,40 @@ module.exports = function(dependencies) {
 			console.log(selectedSymbol())
 		})
 
-		let xhr = new XMLHttpRequest();
-		xhr.open("GET", seriesQueryUrl);
-		xhr.onreadystatechange = () => {
-			if(xhr.readyState === 4 && xhr.status === 200) {
-				let parsedData = JSON.parse(xhr.responseText);
+		let getSeries = new XMLHttpRequest();
+		getSeries.open("GET", seriesQueryUrl);
+		getSeries.onreadystatechange = () => {
+			if(getSeries.readyState == 4 && getSeries.status == 200) {
+				let parsedData = JSON.parse(getSeries.responseText);
 
-				parsedData.forEach((series) => {
-					symbols.push({
+				JSON.parse(parsedData.result).forEach((series) => {
+					symbols.chartChooser.push({
+						label: series,
+						value: series.toUpperCase()
+					});
+					symbols.traderComponent.push({
 						label: series,
 						value: series.toUpperCase()
 					});
 				});
+
+				console.log(symbols.chartChooser());
+				console.log(symbols.traderComponent());
 			}
 		}
 
-		xhr.send(null);
+		getSeries.send(null);
 
-		xhr = new XMLHttpRequest();
-		xhr.open("GET", algorithmQueryUrl);
-		xhr.onreadystatechange = () => {
-			if(xhr.readyState === 4 && xhr.status === 200) {
-				let parsedData = JSON.parse(xhr.responseText);
-				algorithms(parsedData);
+		let getAlgorithms = new XMLHttpRequest();
+		getAlgorithms.open("GET", algorithmQueryUrl);
+		getAlgorithms.onreadystatechange = () => {
+			if(getAlgorithms.readyState == 4 && getAlgorithms.status == 200) {
+				let parsedData = JSON.parse(getAlgorithms.responseText);
+				algorithms(parsedData.result);
 			}
 		}
+
+		getAlgorithms.send(null);
 
 		function createMenuItem(label, url) {
 			return {

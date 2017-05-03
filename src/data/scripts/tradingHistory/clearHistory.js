@@ -9,6 +9,7 @@ mongoose.connect("mongodb://localhost:27017/users");
 
 tradingHistory.remove({}).then((success) => {
   console.log("Transaction history removed successfully! " + success);
+  mongoose.disconnect();
 }).catch((reason) => {
   console.log("Transaction history removal failed because: " + reason);
 });

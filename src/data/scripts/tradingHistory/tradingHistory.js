@@ -2,13 +2,13 @@
 
 const mongoose = require("mongoose");
 const Promise = require("promise");
-const tradingHistory = require("../../models/tradingHistory");
+const TradingHistory = require("../../models/tradingHistory");
 
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost:27017/users");
 
 for(let idx = 0; idx < 10; idx += 1) {
-  new tradingHistory({
+  new TradingHistory({
     user: "user" + idx,
     series: "testSerires",
     price: 420.00,
@@ -16,7 +16,15 @@ for(let idx = 0; idx < 10; idx += 1) {
     transactionType: Math.random() < 0.5 ? "buy" : "sell"
   }).save().then((success) => {
     console.log("Transaction inserted into history: " + success);
+
+    TradingHistory.find().count().exec().then((count) => {
+      if(count === 10) {
+        mongoose.disconnect();
+      }
+    }).catch((reason) => {
+      throw new Error("Error in querying the number of elements in collection " + reason);
+    });
   }).catch((reason) => {
-    console.log("Transaction insert failed because: " + reason);
+    throw new Error("Transaction insert failed because: " + reason);
   });
 }

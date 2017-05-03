@@ -11,6 +11,7 @@ Algorithm.remove({
   name: "Mean Reversion"
 }).exec().then((success) => {
   console.log("Removed Successfully! " + success);
+  mongoose.disconnect();
 }).catch((reason) => {
   console.log("Removal failed because: " + reason);
 });
