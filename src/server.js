@@ -2,7 +2,8 @@
 
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const app = require("express")();
+const express = require("express");
+const app = express();
 const Influx = require("influx");
 const http = require("http");
 const moment = require("moment");
@@ -14,7 +15,6 @@ const User = require("./data/models/user");
 const DataPoint = require("./data/models/dataPoint");
 const TradingHistory = require("./data/models/tradingHistory");
 const Algorithm = require("./data/models/algorithm");
-
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -32,7 +32,7 @@ app.get("/users", (req, res) => {
       error: false
     }));
   }).catch((reason) => {
-    res.status(404).send(JSON.stringify({
+    res.status(400).send(JSON.stringify({
       error: "Query failed due to: " + reason,
       ok: false,
       result: null
@@ -84,7 +84,7 @@ app.get("/seriesNames", (req, res) => {
       error: null
     });
   }).catch((reason) => {
-    res.status(404).send({
+    res.status(400).send({
       error: "Query failed due to: " + reason,
       ok: false,
       result: null
@@ -186,7 +186,6 @@ app.post("/transaction", (req, res) => {
       "userName": userName
     }).exec()
     .then((user) => {
-      console.log(user, user.portfolio.hasOwnProperty(seriesName));
       if(transactionType === "buy") {
         if(user.balance < quantity * lastPrice[0].price) {
           throw new Error("Not enough balance (" + user.balance +
@@ -200,7 +199,7 @@ app.post("/transaction", (req, res) => {
            }
          }
       } else if(transactionType === "sell") {
-        if(!user.portfolio[seriesName] && user.portfolio[seriesName] < quantity) {
+        if(!user.portfolio[seriesName] || user.portfolio[seriesName] < quantity) {
           throw new Error("Not enough instruments to sell (" +
            user.portfolio[seriesName] + ").");
         } else {
@@ -211,29 +210,42 @@ app.post("/transaction", (req, res) => {
           throw new Error("Invalid transactionType:" + transactionType);
       }
 
-      user.save().then((success) => {
+      if(user.portfolio[seriesName] === null) {
+        user.portfolio[seriesName] = 0;
+      }
+
+      User.findOneAndUpdate({
+        userName: userName
+      }, {
+        $set: {
+          portfolio: user.portfolio,
+          balance: user.balance
+        }
+      },{
+        new: true
+      }).then((success) => {
         console.log("Updated user: " + success);
         res.status(200).send(JSON.stringify({
-          result: user,
+          result: success,
           ok: true,
           error: null
         }));
       }).catch((reason) => {
-        res.status(404).send(JSON.stringify({
+        res.status(400).send(JSON.stringify({
           error: "Update failed: " + reason,
           ok: false,
           result: null
         }));
       });
     }).catch((reason) => {
-      res.status(404).send(JSON.stringify({
+      res.status(400).send(JSON.stringify({
         error: "Transaction failed: " + reason,
         ok: false,
         result: null
       }));
     });
   }).catch((reason) => {
-    res.status(404).send({
+    res.status(400).send({
       error:"Query failed due to: " + reason,
       ok: false,
       result: null
@@ -305,14 +317,14 @@ app.post("/runAlgorithm", (req, res) => {
   });
 });
 
-//app.use(express.static("examples/index.html"));
+app.use("/libs/knob.min.css", express.static("../node_modules/knob-js/dist/knob.min.css"));
 
 helper.setRoute("/", "../examples/index.html");
 helper.setRoute("/chartTest", "../examples/chartTest.html");
 helper.setRoute("/chart_data/test_data", "./data/csv_test.csv");
 helper.setRoute("/chart_data/forex_data_test", "./data/test_data.csv");
 helper.setRoute("/libs/knob.js", "../node_modules/knob-js/dist/knob.js");
-helper.setRoute("/libs/knob.min.css", "../node_modules/knob-js/dist/knob.min.css");
+//helper.setRoute("/libs/knob.min.css", "../node_modules/knob-js/dist/knob.min.css");
 helper.setRoute("/built/superdataseries.js", "../dist/superdataseries.js");
 helper.setRoute("/built/main.built.js", "../examples/main.built.js");
 helper.setRoute("/chart_data/formatted50", "./data/format50.csv");

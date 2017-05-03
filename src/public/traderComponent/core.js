@@ -63,7 +63,8 @@ module.exports = function(dependencies) {
 				 post.open("POST", "./transaction", true);
 
 				 post.onreadystatechange = function() {
-				 	if(post.readyState == 4, post.status == 200) {
+				 	if(post.readyState === XMLHttpRequest.DONE && post.status === 200) {
+						console.log("RESPONSE", post.responseText);
 						let responseObject = JSON.parse(post.responseText);
 
 						if(!responseObject.ok) {
