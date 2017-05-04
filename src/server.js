@@ -32,7 +32,7 @@ app.get("/users", (req, res) => {
       error: false
     }));
   }).catch((reason) => {
-    res.status(400).send(JSON.stringify({
+    res.status(409).send(JSON.stringify({
       error: "Query failed due to: " + reason,
       ok: false,
       result: null
@@ -44,9 +44,17 @@ app.get("/dataPoints", (req, res) => {
   DataPoint.find({})
   .exec()
   .then((series) => {
-    res.send(JSON.stringify(series));
+    res.status(200).send(JSON.stringify({
+      result: series,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    throw new Error("No TimeSeries found: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "No TimeSeries found: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -67,9 +75,13 @@ app.get("/dataPoints/:seriesName", (req, res) => {
       response.push(temp);
     });
 
-    res.send(JSON.stringify(response));
+    res.status(200).send(JSON.stringify(response));
   }).catch((reason) => {
-    res.send("Request failed due to: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "Request failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -84,7 +96,7 @@ app.get("/seriesNames", (req, res) => {
       error: null
     });
   }).catch((reason) => {
-    res.status(400).send({
+    res.status(409).send({
       error: "Query failed due to: " + reason,
       ok: false,
       result: null
@@ -96,19 +108,57 @@ app.get("/tradingHistory", (req, res) => {
   TradingHistory.find({})
   .exec()
   .then((history) => {
-    res.send(JSON.stringify(history));
+    res.status(200).send(JSON.stringify({
+      result: history,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    res.send("Query failed due to: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "Query failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
+});
+
+app.get("/tradingHistory/:userName", (req, res) => {
+  let userName = req.params.userName;
+
+  TradingHistory.find({
+    user: userName
+  }).exec()
+  .then((history) => {
+    console.log(history);
+    res.status(200).send(JSON.stringify({
+      result: history,
+      ok: true,
+      error: null
+    }));
+  }).catch((reason) => {
+    res.status(409).send(JSON.stringify({
+      error: "No history found for user: " + userName + ", " + reason,
+      ok: false,
+      result: null
+    }));
+  })
 });
 
 app.get("/algorithms", (req, res) => {
   Algorithm.find({})
   .exec()
   .then((algorithms) => {
-    res.send(JSON.stringify(algorithms));
+    res.status(200).send(JSON.stringify({
+      result: algorithms,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    res.send("Query failed due to: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "Query failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -123,7 +173,7 @@ app.get("/algorithmNames", (req, res) => {
       error: false
     }));
   }).catch((reason) => {
-    res.status.send(JSON.stringify({
+    res.status(409).send(JSON.stringify({
       error: "Query failed due to: " + reason,
       ok: false,
       result: null
@@ -137,15 +187,24 @@ app.get("/algorithms/:algorithmName", (req, res) => {
     "name": split[0] + " " + split[1]
   }).exec()
   .then((algorithm) => {
-    res.send(JSON.stringify(algorithm));
+    res.status(200).send(JSON.stringify({
+      result: algorithm,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    res.send("NOT FOUND");
+    res.status(409).send(JSON.stringify({
+      error: "Algorithm " + split[0] + " " + split[1] + " not found!",
+      ok: false,
+      result: null
+    }));
   });
 });
 
 app.post("/loginrequest", (req, res) => {
   let userName = req.body.user;
   let password = req.body.pass;
+  console.log(userName, password);
 
   User.findOne({
     "userName": userName,
@@ -157,12 +216,21 @@ app.post("/loginrequest", (req, res) => {
       userName: user.userName,
       name: user.name,
       profileUrl: user.profileUrl,
-      balance: user.balance
+      balance: user.balance,
+      portfolio: user.portfolio
     };
 
-    res.send(JSON.stringify(response));
+    res.status(200).send(JSON.stringify({
+      result: response,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    throw new Error("Login failed due to: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "Login failed due to: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -171,6 +239,8 @@ app.post("/transaction", (req, res) => {
   let transactionType = req.body.transactionType;
   let quantity = parseInt(req.body.quantity);
   let seriesName = req.body.seriesName;
+
+  let newTrade;
 
   console.log(userName, transactionType, quantity, seriesName);
 
@@ -187,6 +257,7 @@ app.post("/transaction", (req, res) => {
     }).exec()
     .then((user) => {
       if(transactionType === "buy") {
+        console.log("BUYING!!!!");
         if(user.balance < quantity * lastPrice[0].price) {
           throw new Error("Not enough balance (" + user.balance +
            "). Cost of Transaction: ");
@@ -197,14 +268,33 @@ app.post("/transaction", (req, res) => {
            } else {
              user.portfolio[seriesName] = quantity;
            }
+
+           newTrade = new TradingHistory({
+             user: user.userName,
+             series: seriesName,
+             price: lastPrice[0].price,
+             timeStamp: moment().toString(),
+             amountOfInstrument: quantity,
+             transactionType: "buy"
+           });
          }
       } else if(transactionType === "sell") {
+        console.log("SELLING!!!!!");
         if(!user.portfolio[seriesName] || user.portfolio[seriesName] < quantity) {
           throw new Error("Not enough instruments to sell (" +
            user.portfolio[seriesName] + ").");
         } else {
           user.balance += quantity * lastPrice[0].price;
           user.portfolio[seriesName] -= quantity;
+
+          newTrade = new TradingHistory({
+            user: user.userName,
+            series: seriesName,
+            price: lastPrice[0].price,
+            timeStamp: moment().toString(),
+            amountOfInstrument: quantity,
+            transactionType: "sell"
+          });
         }
       } else {
           throw new Error("Invalid transactionType:" + transactionType);
@@ -224,6 +314,12 @@ app.post("/transaction", (req, res) => {
       },{
         new: true
       }).then((success) => {
+        newTrade.save().then((success) => {
+          console.log("History successfully updated " + success);
+        }).catch((reason) => {
+          throw new Error("History update failed: " + reason);
+        });
+
         console.log("Updated user: " + success);
         res.status(200).send(JSON.stringify({
           result: success,
@@ -231,21 +327,21 @@ app.post("/transaction", (req, res) => {
           error: null
         }));
       }).catch((reason) => {
-        res.status(400).send(JSON.stringify({
+        res.status(409).send(JSON.stringify({
           error: "Update failed: " + reason,
           ok: false,
           result: null
         }));
       });
     }).catch((reason) => {
-      res.status(400).send(JSON.stringify({
+      res.status(409).send(JSON.stringify({
         error: "Transaction failed: " + reason,
         ok: false,
         result: null
       }));
     });
   }).catch((reason) => {
-    res.status(400).send({
+    res.status(409).send({
       error:"Query failed due to: " + reason,
       ok: false,
       result: null
@@ -267,9 +363,17 @@ app.post("/seriesQuery", (req, res) => {
   }).exec()
   .then((dataPoints) => {
     console.log(dataPoints);
-    res.send(JSON.stringify(dataPoints));
+    res.status(200).send(JSON.stringify({
+      result: dataPoints,
+      ok: true,
+      error: null
+    }));
   }).catch((reason) => {
-    throw new Error("TimeSeries data not found: " + reason);
+    res.status(409).send(JSON.stringify({
+      error: "TimeSeries data not found: " + reason,
+      ok: false,
+      result: null
+    }));
   });
 });
 
@@ -310,10 +414,18 @@ app.post("/runAlgorithm", (req, res) => {
         throw new Error(err);
       }
 
-      res.send(JSON.stringify(response));
+      res.send(JSON.stringify({
+        result: response,
+        ok: true,
+        error: null
+      }));
     });
   }).catch((reason) => {
-    res.send("Algorithm: " + algorithmName + " NOT FOUND");
+    res.status(409).send(JSON.stringify({
+      error: "Algorithm: " + algorithmName + " NOT FOUND",
+      ok: false,
+      result: null
+    }));
   });
 });
 

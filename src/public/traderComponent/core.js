@@ -20,8 +20,13 @@ module.exports = function(dependencies) {
 			throw new Error("config.symbols is mandatory and should be an array!");
 		}
 
+		if(!config.errorMessage && typeof config.errorMessage !== "function") {
+			throw new Error("config.errorMessage is mandatory and should be a knockout observable!");
+		}
+
 		var user = config.user;
 		var symbols = config.symbols;
+		var errorMessage = config.errorMessage;
 
 		const header = "Trade";
 		const symbolLabel = "Symbol ";
@@ -63,14 +68,15 @@ module.exports = function(dependencies) {
 				 post.open("POST", "./transaction", true);
 
 				 post.onreadystatechange = function() {
-				 	if(post.readyState === XMLHttpRequest.DONE && post.status === 200) {
+				 	if(post.readyState === XMLHttpRequest.DONE/* && post.status === 200*/) {
 						console.log("RESPONSE", post.responseText);
 						let responseObject = JSON.parse(post.responseText);
 
 						if(!responseObject.ok) {
-							console.log(responseObject.error);
+							errorMessage(responseObject.error);
 						} else {
 							user(responseObject.result);
+							errorMessage(null);
 						}
 				 	}
 				 }

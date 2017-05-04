@@ -6,4 +6,38 @@
 	<div>
 		<span data-bind="text: 'Balance: ' + user().balance + '$'"></span>
 	</div>
+	<div>
+		<h3 data-bind="text: 'Portfolio'"></h3>
+		<div data-bind="foreach: {
+			data: portfolio,
+			as: 'item'
+		}">
+			<div data-bind="text: item.instrument + ':' + item.amount"></div>
+		</div>
+	</div>
+	<div>
+		<div data-bind="visible: !historyVisible()">
+			<knob-button params="
+				label: historyButtons.show.label,
+				click: historyButtons.show.click
+			"></knob-button>
+		</div>
+		<div data-bind="visible: historyVisible">
+			<knob-button params="
+				label: historyButtons.hide.label,
+				click: historyButtons.hide.click
+			"></knob-button>
+			<h3 data-bind="text: 'History'"></h3>
+			<div data-bind="foreach: {
+				data: tradingHistory,
+				as: 'item'
+			}">
+				<div data-bind="text: 'Instrument: ' + item.series +
+				 ', Price: ' + item.price + ', Amount: ' +
+				 amountOfInstrument + ', ' + item.transactionType +
+				  ', Time: ' + item.timeStamp">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

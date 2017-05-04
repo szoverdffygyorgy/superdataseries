@@ -19,36 +19,44 @@ module.exports = function(dependencies) {
 		const algorithmQueryUrl = "./algorithmNames";
 		const seriesUrl = "dataPoints";
 		const runAlgorithm = "./runAlgorithm";
+		const tradingHistoryQueryUrl = "./tradingHistory/";
 
 		let symbols = {
 			chartChooser: ko.observableArray([]),
 			traderComponent: ko.observableArray([])
 		};
 		let selectedSymbol = ko.observable(null);
-
-		let algorithms = ko.observableArray([]);
 		let selectedAlgorithm = ko.observable(null);
 
-		ko.computed(() => {
-			console.log(selectedSymbol())
-		})
+	 	let errorMessage = ko.observable(null);
+
+		let resource = ko.observable(null);
+		let symbol = ko.observable(null);
+		let user = ko.observable(null);
+
+		let tradingHistory = ko.observableArray([]);
 
 		let getSeries = new XMLHttpRequest();
-		getSeries.open("GET", seriesQueryUrl);
+		getSeries.open("GET", seriesQueryUrl, true);
 		getSeries.onreadystatechange = () => {
-			if(getSeries.readyState == 4 && getSeries.status == 200) {
-				let parsedData = JSON.parse(getSeries.responseText);
+			if(getSeries.readyState === 4/* && getSeries.status == 200*/) {
+				let responseObject = JSON.parse(getSeries.responseText);
 
-				JSON.parse(parsedData.result).forEach((series) => {
-					symbols.chartChooser.push({
-						label: series,
-						value: series.toUpperCase()
+				if(!responseObject.ok) {
+					errorMessage(responseObject.error);
+				} else {
+					errorMessage(null);
+					JSON.parse(responseObject.result).forEach((series) => {
+						symbols.chartChooser.push({
+							label: series,
+							value: series.toUpperCase()
+						});
+						symbols.traderComponent.push({
+							label: series,
+							value: series.toUpperCase()
+						});
 					});
-					symbols.traderComponent.push({
-						label: series,
-						value: series.toUpperCase()
-					});
-				});
+				}
 
 				console.log(symbols.chartChooser());
 				console.log(symbols.traderComponent());
@@ -57,12 +65,20 @@ module.exports = function(dependencies) {
 
 		getSeries.send(null);
 
+		let algorithms = ko.observableArray([]);
+
 		let getAlgorithms = new XMLHttpRequest();
-		getAlgorithms.open("GET", algorithmQueryUrl);
+		getAlgorithms.open("GET", algorithmQueryUrl, true);
 		getAlgorithms.onreadystatechange = () => {
-			if(getAlgorithms.readyState == 4 && getAlgorithms.status == 200) {
-				let parsedData = JSON.parse(getAlgorithms.responseText);
-				algorithms(parsedData.result);
+			if(getAlgorithms.readyState == 4/* && getAlgorithms.status == 200*/) {
+				let responseObject = JSON.parse(getAlgorithms.responseText);
+
+				if(!responseObject.ok) {
+					errorMessage(responseObject.error);
+				} else {
+					errorMessage(null);
+					algorithms(responseObject.result);
+				}
 			}
 		}
 
@@ -103,10 +119,6 @@ module.exports = function(dependencies) {
 			createMenuItem("Trade", "#/trade"),
 			createMenuItem("Charts", "#/charts")
 		];
-
-		var resource = ko.observable(null);
-		var symbol = ko.observable(null);
-		var user = ko.observable(null);
 
 		Sammy(function() {
 			this.get("#/login", function() {
@@ -152,7 +164,10 @@ module.exports = function(dependencies) {
 			baseRoute: baseRoute,
 			user: user,
 			seriesQueryUrl: seriesQueryUrl,
-			seriesUrl: seriesUrl
+			seriesUrl: seriesUrl,
+			tradingHistory: tradingHistory,
+			tradingHistoryQueryUrl: tradingHistoryQueryUrl,
+			errorMessage: errorMessage
 		};
 	};
 };

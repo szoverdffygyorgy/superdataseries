@@ -12,7 +12,8 @@
 <div data-bind="if: resource() === 'login' || user() === null">
 	<login-surface params="
 		user: user,
-		menu: menu
+		menu: menu,
+    errorMessage: errorMessage
 	"></login-surface>
 </div>
 <div data-bind="if: resource() === 'profile' && user() !== null">
@@ -20,13 +21,17 @@
 		name: 'Defualt User',
 		profilePictureUrl: 'http://www.mukeshambani.com/photo/default.jpg',
 		balance: 10000,
-		user: user
+		user: user,
+    tradingHistory: tradingHistory,
+    tradingHistoryQueryUrl: tradingHistoryQueryUrl,
+    errorMessage: errorMessage
 	"></profile-component>
 </div>
 <div data-bind="if: resource() === 'trade' && user() != null">
 	<trader-component params="
 		user: user,
-    symbols: symbols.traderComponent
+    symbols: symbols.traderComponent,
+    errorMessage: errorMessage
 	"></trader-component>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() == null && user() !== null">
@@ -34,7 +39,8 @@
 		user: user,
 		baseRoute: baseRoute,
     symbols: symbols.chartChooser,
-    selectedSymbol: selectedSymbol
+    selectedSymbol: selectedSymbol,
+    errorMessage: errorMessage
 	"></chart-chooser>
 </div>
 <div data-bind="if: resource() === 'charts' && symbol() != null && user() != null">
@@ -43,6 +49,9 @@
 			seriesUrl: seriesUrl,
 			divId: 'chart',
       baseRoute: baseRoute,
-      selectedSymbol: selectedSymbol
+      selectedSymbol: selectedSymbol,
+      errorMessage: errorMessage
 		"></chart-component>
+</div>
+<div data-bind = "text: errorMessage()" style = "color: red">
 </div>

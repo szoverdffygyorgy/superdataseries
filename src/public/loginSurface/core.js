@@ -22,9 +22,14 @@ module.exports = function(dependencies) {
 			throw new Error("config.user is mandatory and it should be a knockout observable!");
 		}
 
+		if(!config.errorMessage && typeof config.errorMessage !== "function") {
+			throw new Error("config.errorMessage is mandatory and it should be a knockout observable!");
+		}
+
 		var user = config.user;
 		var loginLabel = config.loginLabel;
 		var menu = config.menu;
+		let errorMessage = config.errorMessage;
 
 		var userInput = {
 			placeholder: "User",
@@ -39,23 +44,33 @@ module.exports = function(dependencies) {
 		var loginButton = {
 			label: "Login",
 			click: function() {
-				var userParams = "user=" + userInput.value() + "&pass=" + passwordInput.value();
 				var post = new XMLHttpRequest();
 
 				post.open("POST", "./loginrequest", true);
 
 				post.onreadystatechange = function() {
-    				if(post.readyState == 4 && post.status == 200) {
+    				if(post.readyState == 4/* && post.status == 200*/) {
         				console.log(post.responseText);
-        				user(JSON.parse(post.responseText));
-        				menu[0].visible(false);
-        				menu[1].visible(true);
-        				location.hash = "/users/" + user().userName;
+								let responseObject = JSON.parse(post.responseText);
+
+								if(!responseObject.ok) {
+									user(null);
+									errorMessage(responseObject.error);
+								} else {
+									user(responseObject.result);
+									errorMessage(null);
+									menu[0].visible(false);
+									menu[1].visible(true);
+									location.hash = "/users/" + user().userName;
+								}
     				}
 				}
 
-				post.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				post.send(userParams);
+				post.setRequestHeader("Content-type", "application/json");
+				post.send(JSON.stringify({
+					user: userInput.value(),
+					pass: passwordInput.value()
+				}));
 			}
 		};
 
