@@ -20,13 +20,33 @@ module.exports = function(dependencies) {
 			throw new Error("config.symbols is mandatory and should be an array!");
 		}
 
+		if(!config.runAlgorithmUrl && typeof config.runAlgorithmUrl !== "string") {
+			throw new Error("config.runAlgorithmUrl is mandatory and should be a string!");
+		}
+
+		if(!config.findAlgorithmUrl && typeof config.findAlgorithmUrl !== "string") {
+			throw new Error("config.findAlgorithmUrl is mandatory and should be a string!");
+		}
+
 		if(!config.errorMessage && typeof config.errorMessage !== "function") {
 			throw new Error("config.errorMessage is mandatory and should be a knockout observable!");
+		}
+
+		if(!config.algorithms && typeof config.algorithms !== "function") {
+			throw new Error("config.algorithms is mandatory and should be a knockout observable!");
+		}
+
+		if(!config.selectedAlgorithm && typeof config.selectedAlgorithm !== "function") {
+			throw new Error("config.selectedAlgorithm is mandatory and should be a knockout observable!");
 		}
 
 		var user = config.user;
 		var symbols = config.symbols;
 		var errorMessage = config.errorMessage;
+		var algorithms = config.algorithms;
+		var selectedAlgorithm = config.selectedAlgorithm;
+		var runAlgorithmUrl = config.runAlgorithmUrl;
+		var findAlgorithmUrl = config.findAlgorithmUrl;
 
 		const header = "Trade";
 		const symbolLabel = "Symbol ";
@@ -91,6 +111,118 @@ module.exports = function(dependencies) {
 			}
 		};
 
+		var algorithmParams = ko.observableArray([]);
+		ko.computed(() => {
+				if(!selectedAlgorithm()) {
+				algorithmParams([]);
+				return;
+			}
+
+			var getAlgorithmParams = new XMLHttpRequest();
+			getAlgorithmParams.open("GET", findAlgorithmUrl + selectedAlgorithm().value, true);
+			getAlgorithmParams.onreadystatechange = () => {
+				if(getAlgorithmParams.readyState === 4) {
+					var responseObject = JSON.parse(getAlgorithmParams.responseText);
+
+					if(!responseObject.ok) {
+						errorMessage(responseObject.error);
+					} else {
+						errorMessage(null);
+						algorithmParams([]);
+						for(var prop in responseObject.result.params) {
+							algorithmParams.push({
+								param: prop,
+								type: responseObject.result.params[prop]
+							});
+						}
+						console.log(algorithmParams());
+					}
+				}
+			}
+
+			getAlgorithmParams.send(null);
+		});
+
+		var algorithmParamObservables = ko.observableArray([]);
+		ko.computed(() => {
+			var observables = [];
+
+			for(var idx = 0; idx < algorithmParams().length; idx += 1) {
+				if(algorithmParams()[idx]["param"] === "user" || algorithmParams()[idx]["param"] === "series") {
+					continue;
+				} else {
+					observables.push({
+						param: algorithmParams()[idx]["param"],
+						value: ko.observable(null)
+					});
+				}
+			}
+
+			algorithmParamObservables(observables);
+		});
+
+		var formVisible = ko.observable(false);
+		var algorithmForm = {
+			showButton: {
+				label: "Advanced Options",
+				click: () => {
+					formVisible(true);
+				}
+			},
+			hideButton: {
+				label: "Hide",
+				click: () => {
+					formVisible(false);
+				}
+			},
+			header: "Try an algorithm",
+			algorithmDropdown: {
+				selectedAlgorithm: selectedAlgorithm,
+				selectedAlgorithmIdx: ko.observable(null),
+				algorithms: algorithms
+			},
+			algorithmParams: algorithmParams,
+			algorithmParamObservables: algorithmParamObservables,
+			startAlgorithmButton: {
+				click: () => {
+					if(!selectedAlgorithm()) {
+						errorMessage("Please select an algorithm!");
+						return;
+					}
+
+					var startAlgorithm = new XMLHttpRequest();
+					startAlgorithm.open("POST", runAlgorithmUrl, true);
+					startAlgorithm.onreadystatechange= () => {
+						if(startAlgorithm.readyState === 4) {
+							var responseObject = JSON.parse(startAlgorithm.responseText);
+								if(responseObject.ok) {
+									user(JSON.parse(responseObject.result));
+								} else {
+									errorMessage(responseObject.error);
+								}
+						}
+					}
+
+					startAlgorithm.setRequestHeader("Content-type", "application/json");
+
+					var params = {};
+					for(var idx = 0; idx < algorithmParamObservables().length; idx += 1) {
+						console.log(algorithmParamObservables()[idx].value());
+						params[algorithmParamObservables()[idx].param] = algorithmParamObservables()[idx].value();
+					}
+
+					params.user = user().userName;
+					params.series = symbolsDropdown.selectedSymbol().label();
+
+					startAlgorithm.send(JSON.stringify({
+						algorithmName: selectedAlgorithm().label(),
+						params: params
+					}));
+				},
+				label: "Start Algorithm"
+			}
+		};
+
 		return {
 			header: header,
 			symbolLabel: symbolLabel,
@@ -99,7 +231,9 @@ module.exports = function(dependencies) {
 			symbolsDropdown: symbolsDropdown,
 			optionsDropdown: optionsDropdown,
 			transactionButton: transactionButton,
-			quantity: quantity
+			quantity: quantity,
+			formVisible: formVisible,
+			algorithmForm: algorithmForm
 		};
 	};
 };

@@ -183,6 +183,7 @@ app.get("/algorithmNames", (req, res) => {
 
 app.get("/algorithms/:algorithmName", (req, res) => {
   let split = req.params.algorithmName.split("_");
+  console.log("TRYING TO FIND Algorithm:" + split[0] + " " + split[1]);
   Algorithm.findOne({
     "name": split[0] + " " + split[1]
   }).exec()
@@ -414,8 +415,8 @@ app.post("/runAlgorithm", (req, res) => {
         throw new Error(err);
       }
 
-      res.send(JSON.stringify({
-        result: response,
+      res.status(200).send(JSON.stringify({
+        result: body,
         ok: true,
         error: null
       }));

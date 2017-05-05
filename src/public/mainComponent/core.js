@@ -17,9 +17,11 @@ module.exports = function(dependencies) {
 		const baseRoute = "localhost:8888";
 		const seriesQueryUrl = "/seriesNames";
 		const algorithmQueryUrl = "./algorithmNames";
+		const findAlgorithmUrl = "./algorithms/";
 		const seriesUrl = "dataPoints";
 		const runAlgorithm = "./runAlgorithm";
 		const tradingHistoryQueryUrl = "./tradingHistory/";
+		const runAlgorithmUrl = "./runAlgorithm";
 
 		let symbols = {
 			chartChooser: ko.observableArray([]),
@@ -70,14 +72,21 @@ module.exports = function(dependencies) {
 		let getAlgorithms = new XMLHttpRequest();
 		getAlgorithms.open("GET", algorithmQueryUrl, true);
 		getAlgorithms.onreadystatechange = () => {
-			if(getAlgorithms.readyState == 4/* && getAlgorithms.status == 200*/) {
+			if(getAlgorithms.readyState === 4/* && getAlgorithms.status == 200*/) {
 				let responseObject = JSON.parse(getAlgorithms.responseText);
 
 				if(!responseObject.ok) {
 					errorMessage(responseObject.error);
 				} else {
 					errorMessage(null);
-					algorithms(responseObject.result);
+					algorithms([]);
+					responseObject.result.forEach((algorithmName) => {
+						let nameSplit = algorithmName.split(" ");
+						algorithms.push({
+							label: algorithmName,
+							value: nameSplit[0] + "_" + nameSplit[1]
+						});
+					});
 				}
 			}
 		}
@@ -167,6 +176,10 @@ module.exports = function(dependencies) {
 			seriesUrl: seriesUrl,
 			tradingHistory: tradingHistory,
 			tradingHistoryQueryUrl: tradingHistoryQueryUrl,
+			runAlgorithmUrl: runAlgorithmUrl,
+			findAlgorithmUrl: findAlgorithmUrl,
+			algorithms: algorithms,
+			selectedAlgorithm: selectedAlgorithm,
 			errorMessage: errorMessage
 		};
 	};

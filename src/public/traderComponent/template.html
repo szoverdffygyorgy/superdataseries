@@ -9,25 +9,60 @@
 			rightIcon: '#icon-expand-more'
 		"></knob-dropdown>
 	</span>
-	<span>
-		<span data-bind="text: transactionLabel"></span>
+	<div data-bind="visible: !formVisible()">
+		<span>
+			<span data-bind="text: transactionLabel"></span>
+			<knob-dropdown params="
+				selected: optionsDropdown.selectedOption,
+				items: optionsDropdown.options,
+				selectedIdx: optionsDropdown.selectedOptionIdx,
+				rightIcon: '#icon-expand-more'
+			"></knob-dropdown>
+		</span>
+		<span>
+			<span data-bind="text: transactionQuantity"></span>
+			<knob-input params="
+				value: quantity
+			"></knob-input>
+		</span>
+		<span>
+			<knob-button params="
+				label: transactionButton.label,
+				click: transactionButton.click
+			"></knob-button>
+		</span>
+		<knob-button params="
+			label: algorithmForm.showButton.label,
+			click: algorithmForm.showButton.click
+		"></knob-button>
+	</div>
+	<div data-bind="visible: formVisible()">
+		<knob-button params="
+			label: algorithmForm.hideButton.label,
+			click: algorithmForm.hideButton.click
+		"></knob-button>
+		<h3 data-bind="text: 'Advanced Options'"></h3>
+		<span data-bind="text: 'Algorithms: '"></span>
 		<knob-dropdown params="
-			selected: optionsDropdown.selectedOption,
-			items: optionsDropdown.options,
-			selectedIdx: optionsDropdown.selectedOptionIdx,
+			selected: algorithmForm.algorithmDropdown.selectedAlgorithm,
+			items: algorithmForm.algorithmDropdown.algorithms,
+			selectedIdx: algorithmForm.algorithmDropdown.selectedAlgorithmIdx,
 			rightIcon: '#icon-expand-more'
 		"></knob-dropdown>
-	</span>
-	<span>
-		<span data-bind="text: transactionQuantity"></span>
-		<knob-input params="
-			value: quantity
-		"></knob-input>
-	</span>
-	<span>
+		<div data-bind="foreach: {
+			data: algorithmForm.algorithmParamObservables,
+			as: 'item'
+		}">
+				<div data-bind="if: (item.param !== 'user' && item.param !== 'series')">
+					<knob-input params="
+						value: item.value,
+						placeholder: item.param
+					"></knob-input>
+				</div>
+		</div>
 		<knob-button params="
-			label: transactionButton.label,
-			click: transactionButton.click
+			label: algorithmForm.startAlgorithmButton.label,
+			click: algorithmForm.startAlgorithmButton.click
 		"></knob-button>
-	</span>
+	</div>
 </div>
