@@ -143,8 +143,7 @@ module.exports = function(dependencies) {
 			getAlgorithmParams.send(null);
 		});
 
-		var algorithmParamObservables = ko.observableArray([]);
-		ko.computed(() => {
+		var algorithmParamObservables = ko.computed(() => {
 			var observables = [];
 
 			for(var idx = 0; idx < algorithmParams().length; idx += 1) {
@@ -158,7 +157,7 @@ module.exports = function(dependencies) {
 				}
 			}
 
-			algorithmParamObservables(observables);
+			return observables;
 		});
 
 		var formVisible = ko.observable(false);
@@ -170,7 +169,7 @@ module.exports = function(dependencies) {
 				}
 			},
 			hideButton: {
-				label: "Hide",
+				label: "Hide Advanced",
 				click: () => {
 					formVisible(false);
 				}
@@ -194,6 +193,7 @@ module.exports = function(dependencies) {
 					startAlgorithm.open("POST", runAlgorithmUrl, true);
 					startAlgorithm.onreadystatechange= () => {
 						if(startAlgorithm.readyState === 4) {
+							//console.log("RESPONSE!", startAlgorithm.responseText);
 							var responseObject = JSON.parse(startAlgorithm.responseText);
 								if(responseObject.ok) {
 									user(JSON.parse(responseObject.result));
