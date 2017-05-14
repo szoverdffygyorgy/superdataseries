@@ -7,24 +7,28 @@ module.exports = function(dependencies) {
 		throw new Error("dependencies.ko is mandatory!");
 	}
 
+	if(dependencies.c3) {
+		var c3 = dependencies.c3;
+	}
+
 	var ko = dependencies.ko;
 
 	return function(config) {
 		config = config || {};
 
-		if(!config.seriesUrl && typeof config.seriesUrl !== "string") {
+		if(!config.seriesUrl || typeof config.seriesUrl !== "string") {
 			throw new Error("config.seriesUrl is mandatory and should be a string!");
 		}
 
-		if(!config.divId && typeof config.divId !== "string") {
+		if(!config.divId || typeof config.divId !== "string") {
 			throw new Error("config.divId is mandatory and should be a string!");
 		}
 
-		if(!config.baseRoute && typeof config.baseRoute !== "string") {
+		if(!config.baseRoute || typeof config.baseRoute !== "string") {
 			throw new Error("config.baseRoute is mandatory and should be a string!");
 		}
 
-		if(!config.selectedSymbol && typeof config.selectedSymbol !== "function") {
+		if(!config.selectedSymbol || typeof config.selectedSymbol !== "function") {
 			throw new Error("config.selectedSymbol is mandatory and should be a knockout observable!");
 		}
 

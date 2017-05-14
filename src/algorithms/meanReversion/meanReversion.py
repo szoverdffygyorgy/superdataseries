@@ -98,8 +98,9 @@ def runAlgorithm():
             tradingHistories.insert_one({
                 "user": user,
                 "series": seriesName,
-                "price": seriesList[i][1],
+                "price": seriesList[index][1],
                 "amountOfInstrument": user["portfolio"][str(seriesName)],
+                "timeStamp": datetime.utcnow(),
                 "transactionType": "sell"
             })
             user["balance"] += user["portfolio"][str(seriesName)] * seriesList[i][1]
@@ -116,6 +117,7 @@ def runAlgorithm():
                 "series": seriesName,
                 "price": seriesList[index][1],
                 "amountOfInstrument": ableToBuy,
+                "timeStamp": datetime.utcnow(),
                 "transactionType": "buy"
             })
             print(json.dumps(user))

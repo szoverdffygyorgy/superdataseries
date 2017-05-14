@@ -53,7 +53,7 @@ def runAlgorithm():
     #window1 = 5
     #window2 = 10
 
-    if window2 < window2:
+    if window2 < window1:
         temp = window1
         window1 = window2
         window2 = temp
@@ -68,7 +68,7 @@ def runAlgorithm():
     series1.plot(style = "r")
     series2.plot(style = "b")
 
-    #matplotlib.pyplot.show()
+    matplotlib.pyplot.show()
 
     #for (attr, value) in window1Series.obj.__dict__.items():
     #    print(attr, value)
@@ -113,6 +113,7 @@ def runAlgorithm():
                 "series": seriesName,
                 "price": series[i][1],
                 "amountOfInstrument": ableToBuy,
+                "timeStamp": datetime.utcnow(),
                 "transactionType": "buy"
             })
             print(json.dumps(user))
@@ -125,6 +126,7 @@ def runAlgorithm():
                 "series": seriesName,
                 "price": series[i][1],
                 "amountOfInstrument": user["portfolio"][str(seriesName)],
+                "timeStamp": datetime.utcnow(),
                 "transactionType": "sell"
             })
             user["balance"] += user["portfolio"][str(seriesName)] * series[i][1]

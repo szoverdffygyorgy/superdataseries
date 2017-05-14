@@ -3,6 +3,7 @@ var jscs = require("gulp-jscs");
 var jshint = require("gulp-jshint");
 var stylish = require("gulp-jscs-stylish");
 var jsonlint = require("gulp-jsonlint");
+var jasmine = require("gulp-jasmine");
 var browserify = require("browserify");
 var partialify = require("partialify");
 var source = require("vinyl-source-stream");
@@ -72,6 +73,15 @@ gulp.task("js", /*["jsonlint", "jshint", "jscs"],*/ createBrowserifyTask({
 	outputFileName: "main.built.js",
 	destFolder: "./src/public/"
 }));
+
+// Tests
+// ==================================================
+gulp.task("jasmine", function() {
+	return gulp.src("src/public/**/*Spec.js")
+		.pipe(jasmine({
+			verbose: true
+		}));
+});
 
 // Build example
 // ==================================================

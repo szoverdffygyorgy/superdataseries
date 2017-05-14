@@ -14,20 +14,19 @@ module.exports = function(dependencies) {
 	return function createLoginSurface(config) {
 		config = config || {};
 
-		if(!config) {
-			throw new Error("config is mandatory!");
-		}
-
-		if(!config.user && typeof config.user !== "function") {
+		if(!config.user || typeof config.user !== "function") {
 			throw new Error("config.user is mandatory and it should be a knockout observable!");
 		}
 
-		if(!config.errorMessage && typeof config.errorMessage !== "function") {
+		if(!config.errorMessage || typeof config.errorMessage !== "function") {
 			throw new Error("config.errorMessage is mandatory and it should be a knockout observable!");
 		}
 
+		if(!config.menu || !(config.menu instanceof Array)) {
+			throw new Error("config.menu is mandatory and it should be an array!");
+		}
+
 		var user = config.user;
-		var loginLabel = config.loginLabel;
 		var menu = config.menu;
 		let errorMessage = config.errorMessage;
 

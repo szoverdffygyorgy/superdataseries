@@ -12,15 +12,15 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
-		if(!config.baseRoute && typeof config.baseRoute !== "string") {
+		if(!config.baseRoute || typeof config.baseRoute !== "string") {
 			throw new Error("config.baseRoute is mandatory and should be a string!");
 		}
 
-		if(!config.symbols && typeof config.symbols !== "array") {
+		if(!config.symbols || !(config.symbols instanceof Array)) {
 			throw new Error("config.symbols is mandatory and should be an array!");
 		}
 
-		if(!config.selectedSymbol && typeof config.selectedSymbol !== "function") {
+		if(!config.selectedSymbol || typeof config.selectedSymbol !== "function") {
 			throw new Error("config.selectedSymbol is mandatory and should be a knockout observable!");
 		}
 
