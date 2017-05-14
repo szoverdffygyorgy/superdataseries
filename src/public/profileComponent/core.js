@@ -12,7 +12,7 @@ module.exports = function(dependencies) {
 	return function(config) {
 		config = config || {};
 
-		if(!config.name && typeof config.name !== "string") {
+		/*if(!config.name && typeof config.name !== "string") {
 			throw new Error("config.name is mandatory and should be a string!");
 		}
 
@@ -22,7 +22,7 @@ module.exports = function(dependencies) {
 
 		if(!config.balance && typeof config.balance !== "number") {
 			throw new Error("config.balance is mandatory and should be a number!");
-		}
+		}*/
 
 		if(!config.user && typeof config.user !== "function") {
 			throw new Error("config.user is mandatory and should be a knockout observable!");
@@ -40,9 +40,9 @@ module.exports = function(dependencies) {
 			throw new Error("config.errorMessage is mandatory and should be a knockout observable!");
 		}
 
-		var name = config.name;
+		/*var name = config.name;
 		var profilePictureUrl = config.profilePictureUrl;
-		var balance = config.balance;
+		var balance = config.balance;*/
 		var user = config.user;
 		var tradingHistory = config.tradingHistory;
 		var tradingHistoryQueryUrl = config.tradingHistoryQueryUrl;
@@ -99,9 +99,9 @@ module.exports = function(dependencies) {
 		});
 
 		return {
-			name: name,
+			/*name: name,
 			profilePictureUrl: profilePictureUrl,
-			balance: balance,
+			balance: balance,*/
 			user: user,
 			tradingHistory: tradingHistory,
 			historyButtons: historyButtons,
