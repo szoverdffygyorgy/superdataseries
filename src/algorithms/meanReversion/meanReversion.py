@@ -103,14 +103,14 @@ def runAlgorithm():
                 "timeStamp": datetime.utcnow(),
                 "transactionType": "sell"
             })
-            user["balance"] += user["portfolio"][str(seriesName)] * seriesList[i][1]
+            user["balance"] += user["portfolio"][str(seriesName)] * seriesList[index][1]
             user["portfolio"][str(seriesName)] = 0
             print(json.dumps(user))
 
         if seriesList[index][1] < lowerBound[seriesList[index][0]]:
             print("BUYING")
             ableToBuy = math.floor(user["balance"] / seriesList[index][1])
-            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / series[index][1])
+            user["portfolio"][str(seriesName)] += math.floor(user["balance"] / seriesList[index][1])
             user["balance"] -= ableToBuy * seriesList[index][1]
             tradingHistories.insert_one({
                 "user": user,
